@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="12dp"
+        android:text="@string/settings"
+        android:textColor="#000"
+        android:textSize="22sp"
+        app:drawableStartCompat="@drawable/arrow" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="28dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="@dimen/textMargin"
+            android:layout_marginBottom="@dimen/textMargin"
+            android:gravity="start"
+            android:text="@string/dark_theme"
+            android:textColor="@color/textSettingsColor"
+            android:textSize="@dimen/textSettingsSize"
+            app:drawableEndCompat="@drawable/switch_theme" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="@dimen/textMargin"
+            android:layout_marginBottom="@dimen/textMargin"
+            android:gravity="start"
+            android:text="@string/share"
+            android:textColor="@color/textSettingsColor"
+            android:textSize="@dimen/textSettingsSize"
+            app:drawableEndCompat="@drawable/share" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="@dimen/textMargin"
+            android:layout_marginBottom="@dimen/textMargin"
+            android:gravity="start"
+            android:text="@string/support"
+            android:textColor="@color/textSettingsColor"
+            android:textSize="@dimen/textSettingsSize"
+            app:drawableEndCompat="@drawable/support" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="@dimen/textMargin"
+            android:layout_marginBottom="@dimen/textMargin"
+            android:gravity="start"
+            android:text="@string/user_agreement"
+            android:textColor="@color/textSettingsColor"
+            android:textSize="@dimen/textSettingsSize"
+            app:drawableEndCompat="@drawable/right_arrow" />
+
+
+    </LinearLayout>
+</LinearLayout>

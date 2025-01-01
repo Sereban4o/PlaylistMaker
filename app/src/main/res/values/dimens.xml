@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="textSize">22sp</dimen>
+    <dimen name="layout_weight">3</dimen>
+    <dimen name="cornerRadius">50dp</dimen>
+    <dimen name="textSettingsSize">16sp</dimen>
+    <dimen name="textMargin">21sp</dimen>
+</resources>
