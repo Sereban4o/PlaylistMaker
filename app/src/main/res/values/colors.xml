@@ -4,8 +4,10 @@
     <color name="white">#FFFFFFFF</color>
     <color name="bg_button">#FFF</color>
     <color name="background">#3772E7</color>
+    <color name="backgroundDark">#1A1B22</color>
     <color name="title">#FFF</color>
     <color name="text_button">#000</color>
     <color name="iconTint">#000</color>
     <color name="textSettingsColor">#000</color>
+    <color name="textSettingsColorDark">#FFF</color>
 </resources>
