@@ -2,7 +2,7 @@
 <resources>
     <dimen name="textSize">22sp</dimen>
     <dimen name="layout_weight">3</dimen>
-    <dimen name="cornerRadius">50dp</dimen>
+    <dimen name="cornerRadius">20dp</dimen>
     <dimen name="textSettingsSize">16sp</dimen>
     <dimen name="textMargin">21sp</dimen>
 </resources>
