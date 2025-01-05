@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="@dimen/appPadding">
+
+    <Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/toolbarMarginTop"
+        android:layout_marginBottom="@dimen/toolbarMargin"
+        android:navigationIcon="@drawable/arrow"
+        android:title="@string/settings"
+        android:titleTextColor="@color/textSettingsColor" />
+
+    <Switch
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/settingMarginBottom"
+        android:checked="false"
+        android:gravity="start"
+        android:text="@string/dark_theme"
+        android:textSize="@dimen/textSettingsSize"
+        android:thumbTint="@color/switch_thumb_color"
+        android:trackTint="@color/switch_track_color"
+        tools:ignore="UseSwitchCompatOrMaterialXml"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginBottom="@dimen/settingMarginBottom"
+        android:gravity="start"
+        android:text="@string/share"
+        android:textColor="@color/textSettingsColor"
+        android:textSize="@dimen/textSettingsSize"
+        app:drawableEndCompat="@drawable/share" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginBottom="@dimen/settingMarginBottom"
+        android:gravity="start"
+        android:text="@string/support"
+        android:textColor="@color/textSettingsColor"
+        android:textSize="@dimen/textSettingsSize"
+        app:drawableEndCompat="@drawable/support" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:gravity="start"
+        android:text="@string/user_agreement"
+        android:textColor="@color/textSettingsColor"
+        android:textSize="@dimen/textSettingsSize"
+        app:drawableEndCompat="@drawable/right_arrow" />
+
+</LinearLayout>

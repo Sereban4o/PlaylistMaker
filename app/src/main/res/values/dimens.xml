@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="textSize">22sp</dimen>
+    <dimen name="layout_weight">3</dimen>
+    <dimen name="cornerRadius">20dp</dimen>
+    <dimen name="textSettingsSize">16sp</dimen>
+    <dimen name="textMargin">21dp</dimen>
+    <dimen name="toolbarMargin">24dp</dimen>
+    <dimen name="appPadding">16dp</dimen>
+    <dimen name="toolbarMarginTop">10dp</dimen>
+    <dimen name="settingMarginBottom">21dp</dimen>
+</resources>
