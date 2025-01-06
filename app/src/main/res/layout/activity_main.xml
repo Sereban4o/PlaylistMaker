@@ -2,60 +2,31 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background"
-    android:orientation="vertical"
-    android:padding="@dimen/appPadding">
+    style="@style/App"
+    android:theme="@style/Base.Theme.PlaylistMaker"
+
+    >
 
     <Toolbar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/toolbarMarginTop"
-        android:layout_marginBottom="@dimen/toolbarMargin"
-        android:title="@string/app_name"
-        android:titleTextColor="@color/title" />
+        style="@style/ToolBar"
+        android:title="@string/app_name" />
 
     <Button
         android:id="@+id/search"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="@dimen/layout_weight"
-        android:backgroundTint="@color/bg_button"
+        style="@style/MainButton"
         android:text="@string/search"
-        android:textColor="@color/text_button"
-        android:textSize="@dimen/textSize"
-        app:cornerRadius="@dimen/cornerRadius"
-        app:icon="@drawable/search"
-        app:iconGravity="textStart"
-        app:iconTint="@color/iconTint" />
+        app:icon="@drawable/search" />
 
     <Button
         android:id="@+id/library"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="@dimen/layout_weight"
-        android:backgroundTint="@color/bg_button"
+        style="@style/MainButton"
         android:text="@string/media"
-        android:textColor="@color/text_button"
-        android:textSize="@dimen/textSize"
-        app:cornerRadius="@dimen/cornerRadius"
-        app:icon="@drawable/library"
-        app:iconGravity="textStart"
-        app:iconTint="@color/iconTint" />
+        app:icon="@drawable/library" />
 
     <Button
         android:id="@+id/settings"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="@dimen/layout_weight"
-        android:backgroundTint="@color/bg_button"
+        style="@style/MainButton"
         android:text="@string/settings"
-        android:textColor="@color/text_button"
-        android:textSize="@dimen/textSize"
-        app:cornerRadius="@dimen/cornerRadius"
-        app:icon="@drawable/settings"
-        app:iconGravity="textStart"
-        app:iconTint="@color/iconTint" />
+        app:icon="@drawable/settings" />
 
 </LinearLayout>
