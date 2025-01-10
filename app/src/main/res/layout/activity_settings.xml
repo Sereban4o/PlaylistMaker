@@ -4,8 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/App"
-    android:background="@color/backgroundSettings"
-    >
+    android:background="@color/backgroundSettings">
 
     <Toolbar
         android:id="@+id/toolbar"
@@ -17,12 +16,11 @@
     <Switch
         style="@style/SettingsButton"
         android:checked="false"
+        android:paddingTop="16dp"
         android:text="@string/dark_theme"
         android:thumbTint="@color/switch_thumb_color"
         android:trackTint="@color/switch_track_color"
-        tools:ignore="RtlSymmetry,UseSwitchCompatOrMaterialXml"
-        android:paddingTop="16dp"
-        />
+        tools:ignore="RtlSymmetry,UseSwitchCompatOrMaterialXml" />
 
     <Button
         android:id="@+id/share"
@@ -34,8 +32,7 @@
         android:id="@+id/support"
         style="@style/SettingsButton"
         android:text="@string/support"
-        app:drawableEndCompat="@drawable/support"
-       />
+        app:drawableEndCompat="@drawable/support" />
 
     <Button
         android:id="@+id/userAgreement"
