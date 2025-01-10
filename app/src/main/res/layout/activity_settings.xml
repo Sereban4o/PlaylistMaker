@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/App"
+    android:background="@color/backgroundSettings">
+
+    <Toolbar
+        android:id="@+id/toolbar"
+        style="@style/ToolBar"
+        android:navigationIcon="@drawable/arrow"
+        android:title="@string/settings"
+        android:titleTextColor="@color/textSettingsColor" />
+
+    <Switch
+        style="@style/SettingsButton"
+        android:checked="false"
+        android:paddingTop="16dp"
+        android:text="@string/dark_theme"
+        android:thumbTint="@color/switch_thumb_color"
+        android:trackTint="@color/switch_track_color"
+        tools:ignore="RtlSymmetry,UseSwitchCompatOrMaterialXml" />
+
+    <Button
+        android:id="@+id/share"
+        style="@style/SettingsButton"
+        android:text="@string/share"
+        app:drawableEndCompat="@drawable/share" />
+
+    <Button
+        android:id="@+id/support"
+        style="@style/SettingsButton"
+        android:text="@string/support"
+        app:drawableEndCompat="@drawable/support" />
+
+    <Button
+        android:id="@+id/userAgreement"
+        style="@style/SettingsButton"
+        android:text="@string/user_agreement"
+        app:drawableEndCompat="@drawable/right_arrow" />
+
+</LinearLayout>
