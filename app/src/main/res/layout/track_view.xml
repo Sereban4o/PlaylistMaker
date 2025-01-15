@@ -43,7 +43,7 @@
                 android:id="@+id/trackArtist"
                 style="@style/SubTextTrack"
                 android:layout_width="0dp"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 android:ellipsize="end" />
 
             <ImageView

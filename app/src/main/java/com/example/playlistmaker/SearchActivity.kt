@@ -18,7 +18,7 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         const val EDIT_TEXT = "EDIT_TEXT"
-        val trackList = arrayListOf(
+        val trackList = listOf(
             Track(
                 "Smells Like Teen Spirit",
                 "Nirvana",

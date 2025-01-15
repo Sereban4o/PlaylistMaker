@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -16,6 +17,7 @@ class TracksViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
     private val trackArtist: TextView = itemView.findViewById(R.id.trackArtist)
     private val trackTime: TextView = itemView.findViewById(R.id.trackTime)
     private val trackImage: ImageView = itemView.findViewById(R.id.trackImage)
+    private val metrics = parent.context.resources
 
     fun bind(track: Track) {
 
@@ -26,7 +28,13 @@ class TracksViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
             .load(track.artworkUrl100)
             .placeholder(R.drawable.placeholder)
             .centerCrop()
-            .transform(RoundedCorners(15))
+            .transform(
+                RoundedCorners(
+                    TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, 2F, metrics.displayMetrics
+                    ).toInt()
+                )
+            )
             .into(trackImage)
     }
 }
