@@ -17,4 +17,6 @@
     <color name="arrowSettingsColor">#1A1B22</color>
     <color name="editSearch">#E6E8EB</color>
     <color name="editText">#AEAFB4</color>
+    <color name="subTextTrack">#AEAFB4</color>
+    <color name="TextTrack">#000000</color>
 </resources>

@@ -13,4 +13,7 @@
     <string name="mailMessage">Спасибо разработчикам и разработчицам за крутое приложение!</string>
     <string name="mailAddress">seropyz@ya.ru</string>
     <string name="clearSearch">Очистить</string>
+    <string name="separator">separator</string>
+    <string name="arrow_button">arrow button</string>
+    <string name="trackImage">track image</string>
 </resources>
