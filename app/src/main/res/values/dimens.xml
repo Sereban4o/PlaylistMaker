@@ -9,4 +9,5 @@
     <dimen name="appPadding">16dp</dimen>
     <dimen name="toolbarMarginTop">10dp</dimen>
     <dimen name="settingMarginBottom">21dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>
