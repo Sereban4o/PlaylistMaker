@@ -128,14 +128,15 @@ class SearchActivity : AppCompatActivity() {
                     response: Response<TrackResponse>
                 ) {
                     trackList.clear()
-                    when (response.code()) {
-                        200 -> {
+                    when (response.isSuccessful) {
+                        true -> {
                             errorSearch.isVisible = false
-                            if (response.body()?.results?.isEmpty() == true) {
+                            val result = response.body()?.results
+                            if (result.isNullOrEmpty()) {
                                 emptySearch.isVisible = true
                             } else {
                                 emptySearch.isVisible = false
-                                response.body()?.results?.let { trackList.addAll(it) }
+                                result.let { trackList.addAll(it) }
                                 recycler.adapter?.notifyDataSetChanged()
                             }
                         }

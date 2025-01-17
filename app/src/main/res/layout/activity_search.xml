@@ -25,7 +25,7 @@
             android:drawableStart="@drawable/search_icon"
             android:drawablePadding="8dp"
             android:fontFamily="@font/ys_display_regular"
-            android:gravity="start"
+            android:gravity="center_vertical"
             android:hint="@string/search"
             android:imeOptions="actionDone"
             android:inputType="text"
@@ -44,10 +44,10 @@
             android:id="@+id/clearIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_gravity="center_vertical|end"
             android:contentDescription="@string/clearSearch"
-            android:padding="12dp"
             android:src="@drawable/search_clear"
+            android:paddingEnd="12dp"
             android:visibility="gone" />
     </FrameLayout>
 
@@ -55,25 +55,23 @@
         android:id="@+id/emptySearch"
         layout="@layout/empty_search"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="16dp"
-        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="13dp"
         android:visibility="gone" />
 
     <include
         android:id="@+id/errorSearch"
         layout="@layout/error_search"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="16dp"
-        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="13dp"
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/trackList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginHorizontal="13dp"
         android:layout_marginTop="16dp" />
 
 </LinearLayout>
