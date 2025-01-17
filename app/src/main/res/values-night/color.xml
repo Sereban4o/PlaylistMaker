@@ -19,4 +19,7 @@
     <color name="editText">#000000</color>
     <color name="subTextTrack">#FFFFFF</color>
     <color name="TextTrack">#FFFFFF</color>
+    <color name="note">#FFFFFF</color>
+    <color name="refreshButtonBackground">#FFFFFF</color>
+    <color name="refreshButtonText">#1A1B22</color>
 </resources>
