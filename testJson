@@ -1,0 +1,17 @@
+{
+    resultCount: 2,
+    results: [
+        {
+            trackName: “название трека”,
+            artistName: “имя исполнителя”,
+            trackTimeMillis: 293000,
+            artworkUrl100: “ссылка на обложку”
+        },
+        {
+            trackName: “название трека”,
+            artistName: “имя исполнителя”,
+            trackTimeMillis: 293000,
+            artworkUrl100: “ссылка на обложку”
+        }
+    ]
+} 
