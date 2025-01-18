@@ -16,4 +16,8 @@
     <string name="separator">separator</string>
     <string name="arrow_button">arrow button</string>
     <string name="trackImage">track image</string>
+    <string name="emptySearch">Ничего не нашлось</string>
+    <string name="errorSearch">Проблемы со связью\n Загрузка не удалась. Проверьте подключение к интернету</string>
+    <string name="refresh">Обновить</string>
+    <string name="noData">Нет данных</string>
 </resources>

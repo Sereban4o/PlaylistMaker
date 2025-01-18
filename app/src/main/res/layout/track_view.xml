@@ -3,7 +3,8 @@
     android:id="@+id/track"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:paddingVertical="8dp"
+    android:background="@color/backgroundSettings"
     android:orientation="horizontal">
 
     <ImageView
@@ -51,13 +52,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginHorizontal="5dp"
+                android:layout_weight="0"
                 android:contentDescription="@string/separator"
                 android:src="@drawable/ellipse" />
 
             <TextView
                 android:id="@+id/trackTime"
                 style="@style/SubTextTrack"
-                android:layout_width="wrap_content" />
+                android:layout_width="wrap_content"
+                android:layout_weight="0" />
         </LinearLayout>
     </LinearLayout>
 
