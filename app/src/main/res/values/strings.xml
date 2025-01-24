@@ -20,4 +20,6 @@
     <string name="errorSearch">Проблемы со связью\n Загрузка не удалась. Проверьте подключение к интернету</string>
     <string name="refresh">Обновить</string>
     <string name="noData">Нет данных</string>
+    <string name="youSearch">Вы искали</string>
+    <string name="cleanHistory">Очистить историю</string>
 </resources>

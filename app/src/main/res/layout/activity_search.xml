@@ -46,10 +46,18 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
             android:contentDescription="@string/clearSearch"
-            android:src="@drawable/search_clear"
             android:paddingEnd="12dp"
+            android:src="@drawable/search_clear"
             android:visibility="gone" />
     </FrameLayout>
+
+    <include
+        android:id="@+id/viewHistoryTracks"
+        layout="@layout/history_tracks_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:visibility="gone" />
 
     <include
         android:id="@+id/emptySearch"
@@ -70,7 +78,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/trackList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="13dp"
         android:layout_marginTop="16dp" />
 

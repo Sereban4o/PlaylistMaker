@@ -30,6 +30,7 @@ class SearchActivity : AppCompatActivity() {
 
     private var text: String = ""
     private val trackList: MutableList<Track> = mutableListOf()
+
     private val baseURL = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
         .baseUrl(baseURL)
@@ -43,17 +44,36 @@ class SearchActivity : AppCompatActivity() {
         setContentView(R.layout.activity_search)
 
         val recycler = findViewById<RecyclerView>(R.id.trackList)
+        val vHistoryTrackList = findViewById<RecyclerView>(R.id.historyTrackList)
         val inputEditText = findViewById<EditText>(R.id.edit)
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
         val emptySearch = findViewById<View>(R.id.emptySearch)
         val errorSearch = findViewById<View>(R.id.errorSearch)
         val errorButtonRefresh = findViewById<Button>(R.id.errorButtonRefresh)
+        val buttonClearHistory = findViewById<Button>(R.id.clearHistory)
+        val sharedPrefs = getSharedPreferences(PLAYLIST_PREF, MODE_PRIVATE)
+        val vHistoryTracks = findViewById<View>(R.id.viewHistoryTracks)
 
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = TracksAdapter(trackList)
 
+        inputEditText.setOnFocusChangeListener { _, hasFocus ->
+            historyTracks(
+                vHistoryTrackList,
+                vHistoryTracks,
+                hasFocus && inputEditText.text.isEmpty()
+            )
+        }
+
+        inputEditText.requestFocus()
+
         errorButtonRefresh.setOnClickListener {
             requestSong(inputEditText, errorSearch, emptySearch, recycler)
+        }
+
+        buttonClearHistory.setOnClickListener {
+            SearchHistory().clear(sharedPrefs)
+            vHistoryTracks.isVisible = false
         }
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
@@ -90,6 +110,11 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 text = s.toString()
                 clearButton.isVisible = !s.isNullOrEmpty()
+                historyTracks(
+                    vHistoryTrackList,
+                    vHistoryTracks,
+                    inputEditText.hasFocus() && inputEditText.text.isEmpty()
+                )
             }
 
             override fun afterTextChanged(s: Editable?) {
@@ -154,5 +179,20 @@ class SearchActivity : AppCompatActivity() {
                     emptySearch.isVisible = false
                 }
             })
+    }
+
+    private fun historyTracks(
+        vHistoryTrackList: RecyclerView,
+        vHistoryTracks: View,
+        visible: Boolean
+    ) {
+        val sharedPrefs = getSharedPreferences(PLAYLIST_PREF, MODE_PRIVATE)
+        val historyTrackList: MutableList<Track> = SearchHistory().get(sharedPrefs)
+
+        vHistoryTrackList.layoutManager = LinearLayoutManager(this)
+        vHistoryTrackList.adapter = HistoryTracksAdapter(historyTrackList)
+
+        vHistoryTracks.isVisible = (historyTrackList.size != 0 && visible)
+
     }
 }

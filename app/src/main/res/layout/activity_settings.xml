@@ -14,6 +14,7 @@
         android:titleTextColor="@color/textSettingsColor" />
 
     <Switch
+        android:id="@+id/switchTheme"
         style="@style/SettingsButton"
         android:checked="false"
         android:paddingTop="16dp"
