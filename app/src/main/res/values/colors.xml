@@ -21,5 +21,7 @@
     <color name="TextTrack">#000000</color>
     <color name="note">#1A1B22</color>
     <color name="refreshButtonBackground">#1A1B22</color>
+    <color name="clearButtonBackground">#1A1B22</color>
     <color name="refreshButtonText">#FFFFFF</color>
+    <color name="clearButtonText">#FFFFFF</color>
 </resources>

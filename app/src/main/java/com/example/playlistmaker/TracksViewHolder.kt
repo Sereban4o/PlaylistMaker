@@ -43,5 +43,6 @@ class TracksViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
                 )
             )
             .into(trackImage)
+
     }
 }
