@@ -30,7 +30,7 @@ class SearchActivity : AppCompatActivity() {
 
     private var text: String = ""
     private val trackList: MutableList<Track> = mutableListOf()
-
+    private lateinit var tracksAdapter: TracksAdapter
     private val baseURL = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
         .baseUrl(baseURL)
@@ -53,9 +53,12 @@ class SearchActivity : AppCompatActivity() {
         val buttonClearHistory = findViewById<Button>(R.id.clearHistory)
         val sharedPrefs = getSharedPreferences(PLAYLIST_PREF, MODE_PRIVATE)
         val vHistoryTracks = findViewById<View>(R.id.viewHistoryTracks)
+        val searchHistory = SearchHistory()
 
         recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = TracksAdapter(trackList)
+        tracksAdapter = TracksAdapter { searchHistory.add(it, sharedPrefs) }
+        tracksAdapter.trackList = trackList
+        recycler.adapter = tracksAdapter
 
         inputEditText.setOnFocusChangeListener { _, hasFocus ->
             historyTracks(
@@ -72,7 +75,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         buttonClearHistory.setOnClickListener {
-            SearchHistory().clear(sharedPrefs)
+            searchHistory.clear(sharedPrefs)
             vHistoryTracks.isVisible = false
         }
 
@@ -99,7 +102,7 @@ class SearchActivity : AppCompatActivity() {
             trackList.clear()
             errorSearch.isVisible = false
             emptySearch.isVisible = false
-            recycler.adapter?.notifyDataSetChanged()
+            tracksAdapter.notifyDataSetChanged()
             hideSoftKeyboard(it)
         }
 
@@ -162,7 +165,7 @@ class SearchActivity : AppCompatActivity() {
                             } else {
                                 emptySearch.isVisible = false
                                 result.let { trackList.addAll(it) }
-                                recycler.adapter?.notifyDataSetChanged()
+                                tracksAdapter.notifyDataSetChanged()
                             }
                         }
 
