@@ -50,7 +50,7 @@
 
         <TextView
             android:id="@+id/trackName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:ellipsize="end"
@@ -61,11 +61,12 @@
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toStartOf="@+id/right_guideline"
             app:layout_constraintStart_toStartOf="@+id/left_guideline"
-            app:layout_constraintTop_toBottomOf="@id/trackImage" />
+            app:layout_constraintTop_toBottomOf="@id/trackImage"
+            android:textAlignment="textStart"/>
 
         <TextView
             android:id="@+id/artistName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:ellipsize="end"
