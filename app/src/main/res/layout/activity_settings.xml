@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/App"
+    android:id="@+id/setting_activity"
     android:background="@color/backgroundSettings">
 
     <Toolbar

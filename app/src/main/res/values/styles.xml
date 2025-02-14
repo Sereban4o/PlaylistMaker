@@ -54,5 +54,31 @@
         <item name="android:textFontWeight">400</item>
         <item name="android:textSize">11sp</item>
     </style>
-    
+
+    <style name="trackInfoTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/trackInfoTitle</item>
+        <item name="layout_constraintStart_toStartOf">@+id/left_guideline</item>
+        <item name="layout_constrainedWidth">true</item>
+        <item name="android:maxLines">1</item>
+        <item name="layout_constraintHorizontal_chainStyle">spread_inside</item>-->
+    </style>
+
+    <style name="trackInfo">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/trackInfo</item>
+        <item name="layout_constraintEnd_toStartOf">@+id/right_guideline</item>
+        <item name="layout_constrainedWidth">true</item>
+        <item name="android:maxLines">1</item>
+    </style>
 </resources>

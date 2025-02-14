@@ -2,6 +2,7 @@ package com.example.playlistmaker
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,11 +12,16 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.Toolbar
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,6 +34,7 @@ class SearchActivity : AppCompatActivity() {
         const val EDIT_TEXT = "EDIT_TEXT"
     }
 
+    private val gson = Gson()
     private var text: String = ""
     private val trackList: MutableList<Track> = mutableListOf()
     private lateinit var tracksAdapter: TracksAdapter
@@ -42,7 +49,12 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-
+        enableEdgeToEdge()
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById<LinearLayout>(R.id.search_activity)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
         val recycler = findViewById<RecyclerView>(R.id.trackList)
         val vHistoryTrackList = findViewById<RecyclerView>(R.id.historyTrackList)
         val inputEditText = findViewById<EditText>(R.id.edit)
@@ -56,7 +68,12 @@ class SearchActivity : AppCompatActivity() {
         val searchHistory = SearchHistory()
 
         recycler.layoutManager = LinearLayoutManager(this)
-        tracksAdapter = TracksAdapter { searchHistory.add(it, sharedPrefs) }
+        tracksAdapter = TracksAdapter {
+            searchHistory.add(it, sharedPrefs)
+            val intent = Intent(this, TrackActivity::class.java)
+            intent.putExtra("track", gson.toJson((it)))
+            startActivity(intent)
+        }
         tracksAdapter.trackList = trackList
         recycler.adapter = tracksAdapter
 
@@ -71,7 +88,7 @@ class SearchActivity : AppCompatActivity() {
         inputEditText.requestFocus()
 
         errorButtonRefresh.setOnClickListener {
-            requestSong(inputEditText, errorSearch, emptySearch, recycler)
+            requestSong(inputEditText, errorSearch, emptySearch)
         }
 
         buttonClearHistory.setOnClickListener {
@@ -81,7 +98,7 @@ class SearchActivity : AppCompatActivity() {
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                requestSong(inputEditText, errorSearch, emptySearch, recycler)
+                requestSong(inputEditText, errorSearch, emptySearch)
             }
             false
         }
@@ -145,8 +162,7 @@ class SearchActivity : AppCompatActivity() {
     private fun requestSong(
         inputEditText: EditText,
         errorSearch: View,
-        emptySearch: View,
-        recycler: RecyclerView
+        emptySearch: View
     ) {
         trackApiService.search(inputEditText.text.toString())
             .enqueue(object : Callback<TrackResponse> {
@@ -193,9 +209,16 @@ class SearchActivity : AppCompatActivity() {
         val historyTrackList: MutableList<Track> = SearchHistory().get(sharedPrefs)
 
         vHistoryTrackList.layoutManager = LinearLayoutManager(this)
-        vHistoryTrackList.adapter = HistoryTracksAdapter(historyTrackList)
+        val historyAdapter = HistoryTracksAdapter {
+            val intent = Intent(this, TrackActivity::class.java)
+            intent.putExtra("track", gson.toJson((it)))
+            startActivity(intent)
+        }
+        historyAdapter.trackList = historyTrackList
+        vHistoryTrackList.adapter = historyAdapter
 
         vHistoryTracks.isVisible = (historyTrackList.size != 0 && visible)
+
 
     }
 }
