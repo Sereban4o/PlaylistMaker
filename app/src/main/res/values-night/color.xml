@@ -28,4 +28,5 @@
     <color name="trackInfo">#FFFFFF</color>
     <color name="trackButton">#FFFFFF</color>
     <color name="trackButtonSub">#ffffff</color>
+    <color name="trackName">#FFFFFF</color>
 </resources>

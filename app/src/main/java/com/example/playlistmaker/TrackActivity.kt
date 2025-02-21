@@ -27,7 +27,7 @@ class TrackActivity : AppCompatActivity() {
             insets
         }
 
-        val track = gson.fromJson(intent.getStringExtra("track"), Track::class.java)
+        val track = intent.getParcelableExtra<Track>(TRACK_VIEW)!!
         val trackName = findViewById<TextView>(R.id.trackName)
         val trackImage = findViewById<ImageView>(R.id.trackImage)
         val artistName = findViewById<TextView>(R.id.artistName)
@@ -44,7 +44,11 @@ class TrackActivity : AppCompatActivity() {
         trackTimeMills.text =
             SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
         collectionName.text = track.collectionName
-        releaseDate.text = SimpleDateFormat("yyyy", Locale.getDefault()).format(track.releaseDate)
+        releaseDate.text = track.releaseDate?.let {
+            SimpleDateFormat("yyyy", Locale.getDefault()).format(
+                it
+            )
+        }
         country.text = track.country
         primaryGenreName.text = track.primaryGenreName
 

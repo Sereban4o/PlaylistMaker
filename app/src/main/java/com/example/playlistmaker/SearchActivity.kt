@@ -71,7 +71,7 @@ class SearchActivity : AppCompatActivity() {
         tracksAdapter = TracksAdapter {
             searchHistory.add(it, sharedPrefs)
             val intent = Intent(this, TrackActivity::class.java)
-            intent.putExtra("track", gson.toJson((it)))
+            intent.putExtra(TRACK_VIEW, (it))
             startActivity(intent)
         }
         tracksAdapter.trackList = trackList
@@ -211,7 +211,7 @@ class SearchActivity : AppCompatActivity() {
         vHistoryTrackList.layoutManager = LinearLayoutManager(this)
         val historyAdapter = HistoryTracksAdapter {
             val intent = Intent(this, TrackActivity::class.java)
-            intent.putExtra("track", gson.toJson((it)))
+            intent.putExtra(TRACK_VIEW, (it))
             startActivity(intent)
         }
         historyAdapter.trackList = historyTrackList

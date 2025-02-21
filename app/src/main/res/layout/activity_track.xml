@@ -56,6 +56,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/ys_display_medium"
             android:maxLines="1"
+            android:textColor="@color/trackName"
             android:textFontWeight="400"
             android:textSize="22sp"
             app:layout_constrainedWidth="true"
@@ -72,6 +73,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/ys_display_medium"
             android:maxLines="1"
+            android:textColor="@color/trackName"
             android:textFontWeight="400"
             android:textSize="14sp"
             app:layout_constrainedWidth="true"
@@ -140,9 +142,8 @@
         <TextView
             android:id="@+id/trackTimeMills"
             style="@style/trackInfo"
-            android:layout_marginTop="4dp"
             app:layout_constraintBottom_toBottomOf="@+id/duration"
-            app:layout_constraintStart_toEndOf="@+id/duration" />
+            app:layout_constraintStart_toEndOf="@+id/duration"/>
 
         <TextView
             android:id="@+id/collection"
@@ -150,18 +151,12 @@
             android:layout_marginTop="17dp"
             android:text="@string/collection"
             app:layout_constraintEnd_toStartOf="@+id/collectionName"
-            app:layout_constraintHorizontal_weight="2"
             app:layout_constraintTop_toBottomOf="@id/duration" />
 
         <TextView
             android:id="@+id/collectionName"
             style="@style/trackInfo"
-            android:layout_width="0dp"
-            android:layout_marginStart="10dp"
-            android:ellipsize="end"
-            android:textAlignment="viewEnd"
             app:layout_constraintBottom_toBottomOf="@+id/collection"
-            app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toEndOf="@+id/collection" />
 
         <TextView

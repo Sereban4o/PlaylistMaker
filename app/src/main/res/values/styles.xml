@@ -66,11 +66,11 @@
         <item name="layout_constraintStart_toStartOf">@+id/left_guideline</item>
         <item name="layout_constrainedWidth">true</item>
         <item name="android:maxLines">1</item>
-        <item name="layout_constraintHorizontal_chainStyle">spread_inside</item>-->
+        <item name="layout_constraintHorizontal_chainStyle">spread_inside</item>
+        <item name="layout_constraintHorizontal_weight">2</item>
     </style>
 
     <style name="trackInfo">
-        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textFontWeight">500</item>
@@ -80,5 +80,9 @@
         <item name="layout_constraintEnd_toStartOf">@+id/right_guideline</item>
         <item name="layout_constrainedWidth">true</item>
         <item name="android:maxLines">1</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:textAlignment">viewEnd</item>
+        <item name="layout_constraintHorizontal_weight">1</item>
     </style>
 </resources>
