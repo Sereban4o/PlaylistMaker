@@ -24,4 +24,9 @@
     <color name="clearButtonBackground">#FFFFFF</color>
     <color name="refreshButtonText">#1A1B22</color>
     <color name="clearButtonText">#1A1B22</color>
+    <color name="trackInfoTitle">#AEAFB4</color>
+    <color name="trackInfo">#FFFFFF</color>
+    <color name="trackButton">#FFFFFF</color>
+    <color name="trackButtonSub">#ffffff</color>
+    <color name="trackName">#FFFFFF</color>
 </resources>

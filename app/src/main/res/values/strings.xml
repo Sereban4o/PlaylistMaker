@@ -22,4 +22,9 @@
     <string name="noData">Нет данных</string>
     <string name="youSearch">Вы искали</string>
     <string name="cleanHistory">Очистить историю</string>
+    <string name="duration">Длительность</string>
+    <string name="collection">Альбом</string>
+    <string name="year">Год</string>
+    <string name="genre">Жанр</string>
+    <string name="country">Страна</string>
 </resources>

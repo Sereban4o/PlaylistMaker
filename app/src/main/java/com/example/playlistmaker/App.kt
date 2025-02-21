@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatDelegate
 const val PLAYLIST_PREF = "PLAYLIST_PREF"
 const val NIGHT_MODE = ""
 const val LAST_TRACKS = "LAST_TRACK"
-
+const val TRACK_VIEW = "TRACK_VIEW"
 class App : Application() {
 
     private var darkTheme = false
