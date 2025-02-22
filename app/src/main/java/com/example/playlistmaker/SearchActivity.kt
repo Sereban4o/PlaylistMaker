@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -13,6 +15,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -21,7 +24,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,9 +34,10 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         const val EDIT_TEXT = "EDIT_TEXT"
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
-    private val gson = Gson()
     private var text: String = ""
     private val trackList: MutableList<Track> = mutableListOf()
     private lateinit var tracksAdapter: TracksAdapter
@@ -44,6 +47,13 @@ class SearchActivity : AppCompatActivity() {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     private val trackApiService: TrackApi = retrofit.create(TrackApi::class.java)
+    private lateinit var inputEditText: EditText
+    private lateinit var errorSearch: View
+    private lateinit var emptySearch: View
+    private lateinit var progressBar: ProgressBar
+    private val searchRunnable = Runnable { requestSong(inputEditText, errorSearch, emptySearch) }
+    private val handler = Handler(Looper.getMainLooper())
+    private var isClickAllowed = true
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,22 +67,25 @@ class SearchActivity : AppCompatActivity() {
         }
         val recycler = findViewById<RecyclerView>(R.id.trackList)
         val vHistoryTrackList = findViewById<RecyclerView>(R.id.historyTrackList)
-        val inputEditText = findViewById<EditText>(R.id.edit)
+        inputEditText = findViewById(R.id.edit)
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
-        val emptySearch = findViewById<View>(R.id.emptySearch)
-        val errorSearch = findViewById<View>(R.id.errorSearch)
+        emptySearch = findViewById(R.id.emptySearch)
+        errorSearch = findViewById(R.id.errorSearch)
         val errorButtonRefresh = findViewById<Button>(R.id.errorButtonRefresh)
         val buttonClearHistory = findViewById<Button>(R.id.clearHistory)
         val sharedPrefs = getSharedPreferences(PLAYLIST_PREF, MODE_PRIVATE)
         val vHistoryTracks = findViewById<View>(R.id.viewHistoryTracks)
         val searchHistory = SearchHistory()
+        progressBar = findViewById(R.id.progressBar)
 
         recycler.layoutManager = LinearLayoutManager(this)
         tracksAdapter = TracksAdapter {
-            searchHistory.add(it, sharedPrefs)
-            val intent = Intent(this, TrackActivity::class.java)
-            intent.putExtra(TRACK_VIEW, (it))
-            startActivity(intent)
+            if (clickDebounce()) {
+                searchHistory.add(it, sharedPrefs)
+                val intent = Intent(this, TrackActivity::class.java)
+                intent.putExtra(TRACK_VIEW, (it))
+                startActivity(intent)
+            }
         }
         tracksAdapter.trackList = trackList
         recycler.adapter = tracksAdapter
@@ -94,13 +107,6 @@ class SearchActivity : AppCompatActivity() {
         buttonClearHistory.setOnClickListener {
             searchHistory.clear(sharedPrefs)
             vHistoryTracks.isVisible = false
-        }
-
-        inputEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                requestSong(inputEditText, errorSearch, emptySearch)
-            }
-            false
         }
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -135,13 +141,13 @@ class SearchActivity : AppCompatActivity() {
                     vHistoryTracks,
                     inputEditText.hasFocus() && inputEditText.text.isEmpty()
                 )
+                searchDebounce()
             }
 
             override fun afterTextChanged(s: Editable?) {
             }
         }
         inputEditText.addTextChangedListener(simpleTextWatcher)
-
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -164,6 +170,11 @@ class SearchActivity : AppCompatActivity() {
         errorSearch: View,
         emptySearch: View
     ) {
+        if (inputEditText.text.toString().isEmpty()){
+            return
+        }
+        trackList.clear()
+        progressBar.isVisible = true
         trackApiService.search(inputEditText.text.toString())
             .enqueue(object : Callback<TrackResponse> {
                 @SuppressLint("NotifyDataSetChanged")
@@ -174,6 +185,7 @@ class SearchActivity : AppCompatActivity() {
                     trackList.clear()
                     when (response.isSuccessful) {
                         true -> {
+                            progressBar.isVisible = false
                             errorSearch.isVisible = false
                             val result = response.body()?.results
                             if (result.isNullOrEmpty()) {
@@ -186,14 +198,15 @@ class SearchActivity : AppCompatActivity() {
                         }
 
                         else -> {
+                            progressBar.isVisible = false
                             errorSearch.isVisible = true
                             emptySearch.isVisible = false
                         }
                     }
-
                 }
 
                 override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                    progressBar.isVisible = false
                     errorSearch.isVisible = true
                     emptySearch.isVisible = false
                 }
@@ -210,15 +223,29 @@ class SearchActivity : AppCompatActivity() {
 
         vHistoryTrackList.layoutManager = LinearLayoutManager(this)
         val historyAdapter = HistoryTracksAdapter {
-            val intent = Intent(this, TrackActivity::class.java)
-            intent.putExtra(TRACK_VIEW, (it))
-            startActivity(intent)
+            if (clickDebounce()) {
+                val intent = Intent(this, TrackActivity::class.java)
+                intent.putExtra(TRACK_VIEW, (it))
+                startActivity(intent)
+            }
         }
         historyAdapter.trackList = historyTrackList
         vHistoryTrackList.adapter = historyAdapter
-
         vHistoryTracks.isVisible = (historyTrackList.size != 0 && visible)
-
-
     }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
 }

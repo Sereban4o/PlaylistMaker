@@ -27,4 +27,5 @@
     <string name="year">Год</string>
     <string name="genre">Жанр</string>
     <string name="country">Страна</string>
+    <string name="trackTime">0:00</string>
 </resources>
