@@ -26,7 +26,7 @@ class TrackActivity : AppCompatActivity() {
         private const val STATE_PREPARED = 1
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
-        private const val DELAY = 1000L
+        private const val DELAY = 100L
     }
 
     private lateinit var playButton: ImageButton
@@ -163,7 +163,7 @@ class TrackActivity : AppCompatActivity() {
         return object : Runnable {
             override fun run() {
                 if (playerState == STATE_PLAYING) {
-                    trackTime += DELAY
+                    trackTime = mediaPlayer.currentPosition.toLong()
                     time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(trackTime)
                     mainThreadHandler?.postDelayed(this, DELAY)
                 }
