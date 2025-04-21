@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.settings
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -13,6 +13,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.playlistmaker.App
+import com.example.playlistmaker.NIGHT_MODE
+import com.example.playlistmaker.R
+import androidx.core.net.toUri
 
 class SettingsActivity : AppCompatActivity() {
     @SuppressLint("UseSwitchCompatOrMaterialCode")
@@ -34,7 +38,7 @@ class SettingsActivity : AppCompatActivity() {
         userAgreement.setOnClickListener {
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse(getString(R.string.offer))
+                getString(R.string.offer).toUri()
             )
             startActivity(intent)
         }
@@ -56,7 +60,7 @@ class SettingsActivity : AppCompatActivity() {
             val message = getString(R.string.mailMessage)
             val title = getString(R.string.mailTitle)
             val intent = Intent(Intent.ACTION_SENDTO)
-            intent.data = Uri.parse("mailto:")
+            intent.data = "mailto:".toUri()
             intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.mailAddress)))
             intent.putExtra(Intent.EXTRA_TEXT, title)
             intent.putExtra(Intent.EXTRA_TEXT, message)

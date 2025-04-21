@@ -16,22 +16,22 @@
         android:theme="@style/Theme.Material3.DayNight.NoActionBar"
         tools:targetApi="31">
         <activity
-            android:name=".TrackActivity"
+            android:name=".ui.track.TrackActivity"
             android:exported="false" />
         <activity
-            android:name=".SearchActivity"
+            android:name=".ui.tracks.SearchActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".LibraryActivity"
+            android:name=".ui.library.LibraryActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.settings.SettingsActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.PlaylistMaker">

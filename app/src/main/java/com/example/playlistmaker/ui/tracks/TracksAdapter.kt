@@ -1,13 +1,13 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.tracks
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.TracksAdapter.OnClickListener
+import com.example.playlistmaker.domain.models.Track
 
-class HistoryTracksAdapter(private val onClickListener: OnClickListener) :
+class TracksAdapter(private val onClickListener: OnClickListener) :
     RecyclerView.Adapter<TracksViewHolder>() {
 
-    var trackList: MutableList<Track> = mutableListOf()
+     var trackList: MutableList<Track> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TracksViewHolder {
         return TracksViewHolder(parent)
@@ -18,8 +18,11 @@ class HistoryTracksAdapter(private val onClickListener: OnClickListener) :
         holder.itemView.setOnClickListener {
             onClickListener.onClick(trackList[position])
         }
-
     }
 
     override fun getItemCount(): Int = trackList.size
+
+    fun interface OnClickListener {
+        fun onClick(track: Track)
+    }
 }

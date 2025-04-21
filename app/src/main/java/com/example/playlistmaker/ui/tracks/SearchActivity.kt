@@ -1,7 +1,6 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.ui.tracks
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -9,7 +8,6 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -24,11 +22,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.example.playlistmaker.PLAYLIST_PREF
+import com.example.playlistmaker.R
+import com.example.playlistmaker.TRACK_VIEW
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.ui.track.TrackActivity
+import com.example.playlistmaker.domain.api.TracksInteractor
+import com.example.playlistmaker.domain.models.Track
 
 class SearchActivity : AppCompatActivity() {
 
@@ -38,15 +38,11 @@ class SearchActivity : AppCompatActivity() {
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
+    private val tracksInteractor = Creator.provideTracksInteractor()
     private var text: String = ""
     private val trackList: MutableList<Track> = mutableListOf()
+    private val historyTrackList: MutableList<Track> = mutableListOf()
     private lateinit var tracksAdapter: TracksAdapter
-    private val baseURL = "https://itunes.apple.com"
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(baseURL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    private val trackApiService: TrackApi = retrofit.create(TrackApi::class.java)
     private lateinit var inputEditText: EditText
     private lateinit var errorSearch: View
     private lateinit var emptySearch: View
@@ -75,13 +71,13 @@ class SearchActivity : AppCompatActivity() {
         val buttonClearHistory = findViewById<Button>(R.id.clearHistory)
         val sharedPrefs = getSharedPreferences(PLAYLIST_PREF, MODE_PRIVATE)
         val vHistoryTracks = findViewById<View>(R.id.viewHistoryTracks)
-        val searchHistory = SearchHistory()
         progressBar = findViewById(R.id.progressBar)
+
 
         recycler.layoutManager = LinearLayoutManager(this)
         tracksAdapter = TracksAdapter {
             if (clickDebounce()) {
-                searchHistory.add(it, sharedPrefs)
+                tracksInteractor.addToHistory(it, sharedPrefs)
                 val intent = Intent(this, TrackActivity::class.java)
                 intent.putExtra(TRACK_VIEW, (it))
                 startActivity(intent)
@@ -105,7 +101,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         buttonClearHistory.setOnClickListener {
-            searchHistory.clear(sharedPrefs)
+            tracksInteractor.clearHistory(sharedPrefs)
             vHistoryTracks.isVisible = false
         }
 
@@ -161,7 +157,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideSoftKeyboard(view: View) {
-        val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         manager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
@@ -170,47 +166,40 @@ class SearchActivity : AppCompatActivity() {
         errorSearch: View,
         emptySearch: View
     ) {
-        if (inputEditText.text.toString().isEmpty()){
+        if (inputEditText.text.toString().isEmpty()) {
             return
         }
         trackList.clear()
         progressBar.isVisible = true
-        trackApiService.search(inputEditText.text.toString())
-            .enqueue(object : Callback<TrackResponse> {
-                @SuppressLint("NotifyDataSetChanged")
-                override fun onResponse(
-                    call: Call<TrackResponse>,
-                    response: Response<TrackResponse>
-                ) {
-                    trackList.clear()
-                    when (response.isSuccessful) {
-                        true -> {
-                            progressBar.isVisible = false
-                            errorSearch.isVisible = false
-                            val result = response.body()?.results
-                            if (result.isNullOrEmpty()) {
-                                emptySearch.isVisible = true
-                            } else {
-                                emptySearch.isVisible = false
-                                result.let { trackList.addAll(it) }
-                                tracksAdapter.notifyDataSetChanged()
-                            }
-                        }
 
-                        else -> {
-                            progressBar.isVisible = false
-                            errorSearch.isVisible = true
+        tracksInteractor.searchTracks(
+            inputEditText.text.toString(), object :
+                TracksInteractor.TracksConsumer {
+                @SuppressLint("NotifyDataSetChanged")
+                override fun consume(foundTracks: List<Track>) {
+                    runOnUiThread {
+                        progressBar.isVisible = false
+                        errorSearch.isVisible = false
+
+                        if (foundTracks.isEmpty()) {
+                            emptySearch.isVisible = true
+                        } else {
                             emptySearch.isVisible = false
+                            foundTracks.let { trackList.addAll(it) }
+                            tracksAdapter.notifyDataSetChanged()
                         }
                     }
                 }
-
-                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                    progressBar.isVisible = false
-                    errorSearch.isVisible = true
-                    emptySearch.isVisible = false
+            },
+            object : TracksInteractor.ErrorConsumer {
+                override fun consume(error: Boolean) {
+                    runOnUiThread {
+                        progressBar.isVisible = false
+                        errorSearch.isVisible = true
+                    }
                 }
-            })
+            }
+        )
     }
 
     private fun historyTracks(
@@ -219,7 +208,6 @@ class SearchActivity : AppCompatActivity() {
         visible: Boolean
     ) {
         val sharedPrefs = getSharedPreferences(PLAYLIST_PREF, MODE_PRIVATE)
-        val historyTrackList: MutableList<Track> = SearchHistory().get(sharedPrefs)
 
         vHistoryTrackList.layoutManager = LinearLayoutManager(this)
         val historyAdapter = HistoryTracksAdapter {
@@ -229,9 +217,21 @@ class SearchActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-        historyAdapter.trackList = historyTrackList
-        vHistoryTrackList.adapter = historyAdapter
-        vHistoryTracks.isVisible = (historyTrackList.size != 0 && visible)
+
+        tracksInteractor.getHistory(sharedPrefs, object : TracksInteractor.TracksHistory {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun consume(history: List<Track>) {
+
+                runOnUiThread {
+                    historyTrackList.clear()
+                    historyTrackList.addAll(history)
+                    historyAdapter.trackList = historyTrackList
+                    vHistoryTrackList.adapter = historyAdapter
+                    vHistoryTracks.isVisible = (historyTrackList.isNotEmpty() && visible)
+
+                }
+            }
+        })
     }
 
     private fun searchDebounce() {
