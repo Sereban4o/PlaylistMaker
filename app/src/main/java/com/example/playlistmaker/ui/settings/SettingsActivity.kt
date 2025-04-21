@@ -1,9 +1,7 @@
 package com.example.playlistmaker.ui.settings
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
@@ -16,9 +14,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.App
 import com.example.playlistmaker.NIGHT_MODE
 import com.example.playlistmaker.R
-import androidx.core.net.toUri
+import com.example.playlistmaker.creator.Creator
+
 
 class SettingsActivity : AppCompatActivity() {
+    private val externalNavigation = Creator.provideExternalNavigation()
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,36 +36,17 @@ class SettingsActivity : AppCompatActivity() {
 
         val userAgreement = findViewById<Button>(R.id.userAgreement)
         userAgreement.setOnClickListener {
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                getString(R.string.offer).toUri()
-            )
-            startActivity(intent)
+            externalNavigation.openUrl(this)
         }
 
         val share = findViewById<Button>(R.id.share)
         share.setOnClickListener {
-            val intent = Intent(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra(
-                Intent.EXTRA_TEXT,
-                getString(R.string.addressPracticum)
-            );
-            startActivity(intent)
-
+            externalNavigation.share(this)
         }
 
         val support = findViewById<Button>(R.id.support)
         support.setOnClickListener {
-            val message = getString(R.string.mailMessage)
-            val title = getString(R.string.mailTitle)
-            val intent = Intent(Intent.ACTION_SENDTO)
-            intent.data = "mailto:".toUri()
-            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.mailAddress)))
-            intent.putExtra(Intent.EXTRA_TEXT, title)
-            intent.putExtra(Intent.EXTRA_TEXT, message)
-            startActivity(intent)
-
+            externalNavigation.mail(this)
         }
 
         val switchTheme = findViewById<Switch>(R.id.switchTheme)
