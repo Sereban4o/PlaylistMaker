@@ -1,6 +1,5 @@
 package com.example.playlistmaker.search.domain.impl
 
-import android.content.SharedPreferences
 import com.example.playlistmaker.search.domain.interactor.SearchInteractor
 import com.example.playlistmaker.search.data.repository.SearchRepository
 import com.example.playlistmaker.search.domain.models.Track
@@ -30,20 +29,19 @@ class SearchInteractorImpl(private val repository: SearchRepository) : SearchInt
         }
     }
 
-    override fun addToHistory(track: Track, sharedPrefs: SharedPreferences) {
-        executor.execute { repository.addToHistory(track, sharedPrefs) }
+    override fun addToHistory(track: Track) {
+        executor.execute { repository.addToHistory(track) }
     }
 
     override fun getHistory(
-        sharedPrefs: SharedPreferences,
         consumer: SearchInteractor.TracksHistory
     ) {
         executor.execute {
-            consumer.consume(repository.getHistory(sharedPrefs))
+            consumer.consume(repository.getHistory())
         }
     }
 
-    override fun clearHistory(sharedPrefs: SharedPreferences) {
-        executor.execute { repository.clearHistory(sharedPrefs) }
+    override fun clearHistory() {
+        executor.execute { repository.clearHistory() }
     }
 }

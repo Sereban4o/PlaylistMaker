@@ -28,7 +28,6 @@ class SettingsViewModel(
 
     fun updateThemeSetting(darkTheme: Boolean) {
         settingsInteractor.updateThemeSetting(darkTheme)
-        settingsInteractor.switchTheme()
     }
 
     fun shareLink(url: String) {
@@ -44,16 +43,17 @@ class SettingsViewModel(
     }
 
     companion object {
-        fun getViewModelFactory(activity: Application) =
+        fun getViewModelFactory() =
             viewModelFactory {
                 initializer {
-                    val interactor = Creator.provideExternalNavigator(activity)
+                    val app = this[APPLICATION_KEY] as Application
+                    val interactor = Creator.provideExternalNavigator(app)
                     val interactorSettings =
-                        Creator.provideSettings(this[APPLICATION_KEY] as Application)
+                        Creator.provideSettings(app)
                     SettingsViewModel(
                         interactor,
                         interactorSettings,
-                        this[APPLICATION_KEY] as Application
+                        app
                     )
                 }
             }

@@ -123,9 +123,6 @@ class SearchViewModel(
 
     fun searchHistory() {
         tracksInteractor.getHistory(
-            getApplication<Application>().applicationContext.getSharedPreferences(
-                PLAYLIST_PREF, Context.MODE_PRIVATE
-            ),
             object :
                 SearchInteractor.TracksHistory {
                 override fun consume(history: List<Track>) {
@@ -141,19 +138,12 @@ class SearchViewModel(
     }
 
     fun clearHistory() {
-        tracksInteractor.clearHistory(
-            getApplication<Application>().applicationContext.getSharedPreferences(
-                PLAYLIST_PREF, Context.MODE_PRIVATE
-            )
-        )
+        tracksInteractor.clearHistory()
     }
 
     fun addToHistory(track: Track) {
         tracksInteractor.addToHistory(
-            track,
-            getApplication<Application>().applicationContext.getSharedPreferences(
-                PLAYLIST_PREF, Context.MODE_PRIVATE
-            )
+            track
         )
     }
 

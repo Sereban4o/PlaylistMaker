@@ -29,7 +29,7 @@ class SettingsActivity : AppCompatActivity() {
         }
         viewModel = ViewModelProvider(
             this,
-            SettingsViewModel.Companion.getViewModelFactory(application)
+            SettingsViewModel.Companion.getViewModelFactory()
         )[SettingsViewModel::class.java]
 
         binding.toolbar.setNavigationOnClickListener {

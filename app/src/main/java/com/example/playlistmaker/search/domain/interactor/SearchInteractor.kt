@@ -1,17 +1,16 @@
 package com.example.playlistmaker.search.domain.interactor
 
-import android.content.SharedPreferences
 import com.example.playlistmaker.search.domain.models.Track
 
 interface SearchInteractor {
 
     fun searchTracks(expression: String, consumer: TracksConsumer)
 
-    fun getHistory(sharedPrefs: SharedPreferences, consumer: TracksHistory)
+    fun getHistory(consumer: TracksHistory)
 
-    fun addToHistory(track: Track, sharedPrefs: SharedPreferences)
+    fun addToHistory(track: Track)
 
-    fun clearHistory(sharedPrefs: SharedPreferences)
+    fun clearHistory()
 
     interface TracksConsumer {
         fun consume(foundTracks: List<Track>?, errorMessage: String?)

@@ -8,18 +8,20 @@ import com.example.playlistmaker.search.data.network.RetrofitNetworkClient
 import com.example.playlistmaker.search.domain.interactor.SearchInteractor
 import com.example.playlistmaker.search.data.repository.SearchRepository
 import com.example.playlistmaker.search.domain.impl.SearchInteractorImpl
+import com.example.playlistmaker.settings.data.impl.SettingsRepositoryImpl
+import com.example.playlistmaker.settings.data.repository.SettingsRepository
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractor
 import com.example.playlistmaker.settings.domain.impl.SettingsInteractorImpl
 import com.example.playlistmaker.sharing.domain.interactor.ExternalNavigatorInteractor
 
 
 object Creator {
-    private fun getTracksRepository(context: Context): SearchRepository {
-        return SearchRepositoryImpl(RetrofitNetworkClient(context))
+    private fun getTracksRepository(application: Application): SearchRepository {
+        return SearchRepositoryImpl(RetrofitNetworkClient(application), application)
     }
 
-    fun provideTracksInteractor(context: Context): SearchInteractor {
-        return SearchInteractorImpl(getTracksRepository(context))
+    fun provideTracksInteractor(application: Application): SearchInteractor {
+        return SearchInteractorImpl(getTracksRepository(application))
     }
 
     private fun getExternalNavigator(application: Application): ExternalNavigatorInteractor {
@@ -30,12 +32,12 @@ object Creator {
         return getExternalNavigator(application)
     }
 
-    private fun getSettings(application: Application): SettingsInteractor {
-        return SettingsInteractorImpl(application)
+    private fun getSettings(application: Application): SettingsRepository {
+        return SettingsRepositoryImpl(application)
     }
 
     fun provideSettings(application: Application): SettingsInteractor {
-        return getSettings(application)
+        return SettingsInteractorImpl(getSettings(application))
 
     }
 

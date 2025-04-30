@@ -1,8 +1,11 @@
 package com.example.playlistmaker.search.data.impl
 
+import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.example.playlistmaker.LAST_TRACKS
+import com.example.playlistmaker.PLAYLIST_PREF
 import com.example.playlistmaker.search.data.network.NetworkClient
 import com.example.playlistmaker.search.data.dto.SearchRequest
 import com.example.playlistmaker.search.data.dto.SearchResponse
@@ -14,7 +17,8 @@ import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class SearchRepositoryImpl(private val networkClient: NetworkClient) : SearchRepository {
+class SearchRepositoryImpl(private val networkClient: NetworkClient, application: Application) : SearchRepository {
+    private val sharedPrefs = application.getSharedPreferences(PLAYLIST_PREF, Context.MODE_PRIVATE)
     private val gson = Gson()
     override fun searchTracks(expression: String): Resource<List<Track>> {
         val response = networkClient.doRequest(SearchRequest(expression))
@@ -49,7 +53,7 @@ class SearchRepositoryImpl(private val networkClient: NetworkClient) : SearchRep
         }
     }
 
-    override fun getHistory(sharedPrefs: SharedPreferences): List<Track> {
+    override fun getHistory(): List<Track> {
         val historyTracks = getArrayFromJSON(sharedPrefs)
 
         return historyTracks
@@ -57,8 +61,7 @@ class SearchRepositoryImpl(private val networkClient: NetworkClient) : SearchRep
     }
 
     override fun addToHistory(
-        track: Track,
-        sharedPrefs: SharedPreferences
+        track: Track
     ) {
         val historyTracks = getArrayFromJSON(sharedPrefs)
 
@@ -77,7 +80,7 @@ class SearchRepositoryImpl(private val networkClient: NetworkClient) : SearchRep
         sharedPrefs.edit() { putString(LAST_TRACKS, newString) }
     }
 
-    override fun clearHistory(sharedPrefs: SharedPreferences) {
+    override fun clearHistory() {
         val historyTracks = getArrayFromJSON(sharedPrefs)
 
         historyTracks.clear()
