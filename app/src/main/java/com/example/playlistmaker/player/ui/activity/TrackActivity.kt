@@ -1,0 +1,92 @@
+package com.example.playlistmaker.player.ui.activity
+
+import android.annotation.SuppressLint
+import android.os.Bundle
+import android.util.TypedValue
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.R
+import com.example.playlistmaker.TRACK_VIEW
+import com.example.playlistmaker.databinding.ActivityTrackBinding
+import com.example.playlistmaker.player.domain.model.PlayStatus
+import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.player.ui.view_model.TrackViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
+
+class TrackActivity : AppCompatActivity() {
+
+
+    private lateinit var viewModel: TrackViewModel
+    private lateinit var binding: ActivityTrackBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityTrackBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        enableEdgeToEdge()
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.activityTrack) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+        val track = intent.getParcelableExtra<Track>(TRACK_VIEW)!!
+        viewModel = ViewModelProvider(
+            this,
+            TrackViewModel.getViewModelFactory(track)
+        )[TrackViewModel::class.java]
+
+        viewModel.observeState().observe(this) {
+            render(it)
+        }
+
+        binding.trackName.text = track.trackName
+        binding.artistName.text = track.artistName
+        binding.trackTimeMills.text = track.trackTimeMillis
+        binding.collectionName.text = track.collectionName
+        binding.releaseDate.text = track.releaseDate
+        binding.country.text = track.country
+        binding.primaryGenreName.text = track.primaryGenreName
+
+        Glide.with(this)
+            .load(track.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg"))
+            .placeholder(R.drawable.placeholder_big)
+            .centerCrop()
+            .transform(
+                RoundedCorners(
+                    TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, 2F, getResources().displayMetrics
+                    ).toInt()
+                )
+            )
+            .into(binding.trackImage)
+
+
+        binding.arrowBack.setOnClickListener {
+            viewModel.release()
+            finish()
+        }
+        viewModel.preparePlayer()
+
+
+        binding.playButton.setOnClickListener {
+            viewModel.playbackControl()
+        }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun render(state: PlayStatus) {
+        if (state.isPlaying) {
+            binding.playButton.setImageDrawable(getDrawable(R.drawable.pause))
+        } else {
+            binding.playButton.setImageDrawable(getDrawable(R.drawable.play))
+        }
+        binding.time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(state.progress)
+    }
+}
