@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main"
+    android:id="@+id/activity_track"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/App"
@@ -12,7 +12,7 @@
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".ui.track.TrackActivity">
+        tools:context=".player.ui.activity.TrackActivity">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/left_guideline"
