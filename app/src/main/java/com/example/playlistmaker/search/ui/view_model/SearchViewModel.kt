@@ -1,43 +1,29 @@
 package com.example.playlistmaker.search.ui.view_model
 
 import android.app.Application
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.PLAYLIST_PREF
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.interactor.SearchInteractor
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.domain.state.TrackListHistoryState
 import com.example.playlistmaker.search.domain.state.TrackListState
 
 class SearchViewModel(
-    application: Application
+    application: Application,
+    private val searchInteractor: SearchInteractor
 ) : AndroidViewModel(application) {
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private val SEARCH_REQUEST_TOKEN = Any()
-
-
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SearchViewModel(this[APPLICATION_KEY] as Application)
-            }
-        }
     }
 
     private val handler = Handler(Looper.getMainLooper())
-    private val tracksInteractor = Creator.provideTracksInteractor(getApplication<Application>())
     private var stateLiveData = MutableLiveData<TrackListState>()
     private var stateHistoryLiveData = MutableLiveData<TrackListHistoryState>()
     private var searchText: String? = ""
@@ -73,7 +59,7 @@ class SearchViewModel(
         }
         stateLiveData.postValue(TrackListState.Loading)
 
-        tracksInteractor.searchTracks(
+        searchInteractor.searchTracks(
             expression, object :
                 SearchInteractor.TracksConsumer {
 
@@ -122,7 +108,7 @@ class SearchViewModel(
     }
 
     fun searchHistory() {
-        tracksInteractor.getHistory(
+        searchInteractor.getHistory(
             object :
                 SearchInteractor.TracksHistory {
                 override fun consume(history: List<Track>) {
@@ -138,11 +124,11 @@ class SearchViewModel(
     }
 
     fun clearHistory() {
-        tracksInteractor.clearHistory()
+        searchInteractor.clearHistory()
     }
 
     fun addToHistory(track: Track) {
-        tracksInteractor.addToHistory(
+        searchInteractor.addToHistory(
             track
         )
     }

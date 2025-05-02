@@ -6,14 +6,11 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.player.domain.model.PlayStatus
 import com.example.playlistmaker.search.domain.models.Track
 
 class TrackViewModel(
     private val track: Track
-
 ) : ViewModel() {
 
     companion object {
@@ -22,15 +19,6 @@ class TrackViewModel(
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
         private const val DELAY = 100L
-
-        fun getViewModelFactory(track: Track) = viewModelFactory {
-            initializer {
-                TrackViewModel(
-                    track
-
-                )
-            }
-        }
     }
 
     private var mediaPlayer = MediaPlayer()

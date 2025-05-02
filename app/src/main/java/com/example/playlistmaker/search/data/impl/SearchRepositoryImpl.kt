@@ -1,11 +1,8 @@
 package com.example.playlistmaker.search.data.impl
 
-import android.app.Application
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.example.playlistmaker.LAST_TRACKS
-import com.example.playlistmaker.PLAYLIST_PREF
 import com.example.playlistmaker.search.data.network.NetworkClient
 import com.example.playlistmaker.search.data.dto.SearchRequest
 import com.example.playlistmaker.search.data.dto.SearchResponse
@@ -17,9 +14,12 @@ import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class SearchRepositoryImpl(private val networkClient: NetworkClient, application: Application) : SearchRepository {
-    private val sharedPrefs = application.getSharedPreferences(PLAYLIST_PREF, Context.MODE_PRIVATE)
-    private val gson = Gson()
+class SearchRepositoryImpl(
+    private val networkClient: NetworkClient,
+    private val sharedPreferences: SharedPreferences,
+    private val gson: Gson
+) : SearchRepository {
+
     override fun searchTracks(expression: String): Resource<List<Track>> {
         val response = networkClient.doRequest(SearchRequest(expression))
 
@@ -54,7 +54,7 @@ class SearchRepositoryImpl(private val networkClient: NetworkClient, application
     }
 
     override fun getHistory(): List<Track> {
-        val historyTracks = getArrayFromJSON(sharedPrefs)
+        val historyTracks = getArrayFromJSON()
 
         return historyTracks
 
@@ -63,7 +63,7 @@ class SearchRepositoryImpl(private val networkClient: NetworkClient, application
     override fun addToHistory(
         track: Track
     ) {
-        val historyTracks = getArrayFromJSON(sharedPrefs)
+        val historyTracks = getArrayFromJSON()
 
         val findTrack = historyTracks.find { it.trackId == track.trackId }
 
@@ -77,19 +77,19 @@ class SearchRepositoryImpl(private val networkClient: NetworkClient, application
 
         historyTracks.add(0, track)
         val newString = gson.toJson((historyTracks))
-        sharedPrefs.edit() { putString(LAST_TRACKS, newString) }
+        sharedPreferences.edit() { putString(LAST_TRACKS, newString) }
     }
 
     override fun clearHistory() {
-        val historyTracks = getArrayFromJSON(sharedPrefs)
+        val historyTracks = getArrayFromJSON()
 
         historyTracks.clear()
         val newString = gson.toJson((historyTracks))
-        sharedPrefs.edit() { putString(LAST_TRACKS, newString) }
+        sharedPreferences.edit() { putString(LAST_TRACKS, newString) }
     }
 
-    private fun getArrayFromJSON(sharedPrefs: SharedPreferences): MutableList<Track> {
-        val stringHistoryTracks = sharedPrefs.getString(LAST_TRACKS, "")!!
+    private fun getArrayFromJSON(): MutableList<Track> {
+        val stringHistoryTracks = sharedPreferences.getString(LAST_TRACKS, "")!!
         val typeToken = object : TypeToken<MutableList<Track>>() {}.type
         var historyTracks: MutableList<Track> = mutableListOf()
 
