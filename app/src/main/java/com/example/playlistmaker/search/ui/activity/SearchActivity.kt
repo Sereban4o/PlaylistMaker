@@ -16,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.TRACK_VIEW
@@ -28,6 +27,7 @@ import com.example.playlistmaker.search.domain.state.TrackListState
 import com.example.playlistmaker.search.ui.adapter.HistoryTracksAdapter
 import com.example.playlistmaker.search.ui.adapter.TracksAdapter
 import com.example.playlistmaker.search.ui.view_model.SearchViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
@@ -36,7 +36,7 @@ class SearchActivity : AppCompatActivity() {
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
-    private lateinit var viewModel: SearchViewModel
+    private val viewModel: SearchViewModel by viewModel()
     private lateinit var binding: ActivitySearchBinding
     private lateinit var textWatcher: TextWatcher
     private var text: String = ""
@@ -89,11 +89,6 @@ class SearchActivity : AppCompatActivity() {
             LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         historyTrackList.adapter = trackHistoryAdapter
         trackViewHistory = binding.viewHistoryTracks.root
-
-        viewModel = ViewModelProvider(
-            this,
-            SearchViewModel.getViewModelFactory()
-        )[SearchViewModel::class.java]
 
         viewModel.observeState().observe(this) {
             render(it)
@@ -182,33 +177,33 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showLoading() {
-        trackViewHistory.visibility = View.GONE
-        trackList.visibility = View.GONE
-        errorSearch.visibility = View.GONE
-        emptySearch.visibility = View.GONE
-        progressBar.visibility = View.VISIBLE
+        trackViewHistory.isVisible = false
+        trackList.isVisible = false
+        errorSearch.isVisible = false
+        emptySearch.isVisible = false
+        progressBar.isVisible = true
     }
 
     private fun showError() {
-        trackViewHistory.visibility = View.GONE
-        trackList.visibility = View.GONE
-        errorSearch.visibility = View.VISIBLE
-        emptySearch.visibility = View.GONE
-        progressBar.visibility = View.GONE
+        trackViewHistory.isVisible = false
+        trackList.isVisible = false
+        errorSearch.isVisible = true
+        emptySearch.isVisible = false
+        progressBar.isVisible = false
     }
 
     private fun showEmpty() {
-        trackViewHistory.visibility = View.GONE
-        trackList.visibility = View.GONE
-        errorSearch.visibility = View.GONE
-        emptySearch.visibility = View.VISIBLE
-        progressBar.visibility = View.GONE
+        trackViewHistory.isVisible = false
+        trackList.isVisible = false
+        errorSearch.isVisible = false
+        emptySearch.isVisible = true
+        progressBar.isVisible = false
     }
 
     private fun showContent(tracks: List<Track>) {
-        trackViewHistory.visibility = View.GONE
-        trackList.visibility = View.VISIBLE
-        progressBar.visibility = View.GONE
+        trackViewHistory.isVisible = false
+        trackList.isVisible = true
+        progressBar.isVisible = false
         tracksAdapter.trackList.clear()
         tracksAdapter.trackList.addAll(tracks)
         tracksAdapter.notifyDataSetChanged()

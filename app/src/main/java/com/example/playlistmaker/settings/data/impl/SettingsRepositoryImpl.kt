@@ -1,19 +1,15 @@
 package com.example.playlistmaker.settings.data.impl
 
 import android.app.Application
-import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import com.example.playlistmaker.NIGHT_MODE
-import com.example.playlistmaker.PLAYLIST_PREF
 import com.example.playlistmaker.settings.data.repository.SettingsRepository
 
-class SettingsRepositoryImpl(application: Application): SettingsRepository {
+class SettingsRepositoryImpl(application: Application, private val sharedPreferences: SharedPreferences): SettingsRepository {
 
-    private val sharedPreferences: SharedPreferences =
-        application.getSharedPreferences(PLAYLIST_PREF, MODE_PRIVATE)
     private val isDarkModeOn =
         (application.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 

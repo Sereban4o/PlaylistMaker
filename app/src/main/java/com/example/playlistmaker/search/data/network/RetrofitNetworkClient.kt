@@ -6,18 +6,11 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.example.playlistmaker.search.data.dto.Response
 import com.example.playlistmaker.search.data.dto.SearchRequest
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class RetrofitNetworkClient(private val application: Application) : NetworkClient {
-
-    private val baseUrl = "https://itunes.apple.com"
-
-    private val service = Retrofit.Builder()
-        .baseUrl(baseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(SearchApiService::class.java)
+class RetrofitNetworkClient(
+    private val application: Application,
+    private val searchApiService: SearchApiService
+) : NetworkClient {
 
     override fun doRequest(dto: Any): Response {
 
@@ -26,7 +19,7 @@ class RetrofitNetworkClient(private val application: Application) : NetworkClien
         }
 
         if (dto is SearchRequest) {
-            val response = service.searchTracks(dto.expression).execute()
+            val response = searchApiService.searchTracks(dto.expression).execute()
 
             val body = response.body()
 

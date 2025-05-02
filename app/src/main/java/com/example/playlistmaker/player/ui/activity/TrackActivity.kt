@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
@@ -16,13 +15,15 @@ import com.example.playlistmaker.databinding.ActivityTrackBinding
 import com.example.playlistmaker.player.domain.model.PlayStatus
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.player.ui.view_model.TrackViewModel
+import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class TrackActivity : AppCompatActivity() {
 
-
-    private lateinit var viewModel: TrackViewModel
+    private var track = Track()
+    private val viewModel: TrackViewModel by lazy{getViewModel { parametersOf(track) }}
     private lateinit var binding: ActivityTrackBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,26 +37,22 @@ class TrackActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        val track = intent.getParcelableExtra<Track>(TRACK_VIEW)!!
-        viewModel = ViewModelProvider(
-            this,
-            TrackViewModel.getViewModelFactory(track)
-        )[TrackViewModel::class.java]
+        track = intent.getParcelableExtra<Track>(TRACK_VIEW)!!
 
         viewModel.observeState().observe(this) {
             render(it)
         }
 
-        binding.trackName.text = track.trackName
-        binding.artistName.text = track.artistName
-        binding.trackTimeMills.text = track.trackTimeMillis
-        binding.collectionName.text = track.collectionName
-        binding.releaseDate.text = track.releaseDate
-        binding.country.text = track.country
-        binding.primaryGenreName.text = track.primaryGenreName
+        binding.trackName.text = track?.trackName
+        binding.artistName.text = track?.artistName
+        binding.trackTimeMills.text = track?.trackTimeMillis
+        binding.collectionName.text = track?.collectionName
+        binding.releaseDate.text = track?.releaseDate
+        binding.country.text = track?.country
+        binding.primaryGenreName.text = track?.primaryGenreName
 
         Glide.with(this)
-            .load(track.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg"))
+            .load(track?.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg"))
             .placeholder(R.drawable.placeholder_big)
             .centerCrop()
             .transform(
