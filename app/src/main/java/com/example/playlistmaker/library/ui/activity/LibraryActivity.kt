@@ -7,12 +7,15 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityLibraryBinding
 import com.example.playlistmaker.library.ui.adapter.TabViewPageAdapter
+import com.example.playlistmaker.library.ui.view_model.LibraryViewModel
 import com.google.android.material.tabs.TabLayoutMediator
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LibraryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLibraryBinding
     private lateinit var tabMediator: TabLayoutMediator
+    private val viewModel: LibraryViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
