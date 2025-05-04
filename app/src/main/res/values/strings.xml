@@ -28,4 +28,10 @@
     <string name="genre">Жанр</string>
     <string name="country">Страна</string>
     <string name="trackTime">0:00</string>
+    <string name="library">Медиатека</string>
+    <string name="favorite_tracks">Избранный треки</string>
+    <string name="playlists">Плейлисты</string>
+    <string name="empty_favorite">Ваша медиатека пуста</string>
+    <string name="empty_playlists">Вы не создали\n ни одного плейлиста</string>
+    <string name="new_playlist">Новый плейлист</string>
 </resources>
