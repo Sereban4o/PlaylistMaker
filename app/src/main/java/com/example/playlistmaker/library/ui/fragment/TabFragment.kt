@@ -40,7 +40,10 @@ class TabFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.favorite.root.isVisible = (requireArguments().getInt(NUMBER) == FAVORITES_TAB)
-        binding.playlists.root.isVisible = (requireArguments().getInt(NUMBER) == PLAYLISTS_TAB)
+
+        viewModel.getCurrentTab().observe(viewLifecycleOwner) { number ->
+            binding.favorite.root.isVisible = (number == FAVORITES_TAB)
+            binding.playlists.root.isVisible = (number == PLAYLISTS_TAB)
+        }
     }
 }
