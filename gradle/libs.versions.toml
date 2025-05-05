@@ -14,6 +14,7 @@ gson = "2.11.0"
 retrofit = "2.11.0"
 converter-gson = "2.11.0"
 koin-bom = "3.3.0"
+fragment_version = "1.5.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -30,7 +31,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converter-gson" }
 koin-bom = { module = "io.insert-koin:koin-android", version.ref = "koin-bom" }
-
+fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragment_version"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

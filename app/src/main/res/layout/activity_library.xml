@@ -1,10 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/library"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundSettings"
+    android:orientation="vertical"
     tools:context=".library.ui.activity.LibraryActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Toolbar
+        android:id="@+id/toolbar"
+        style="@style/ToolBar"
+        android:layout_marginBottom="0dp"
+        android:navigationIcon="@drawable/arrow"
+        android:title="@string/library"
+        android:titleTextColor="@color/textSettingsColor" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:background="@color/backgroundSettings"
+        app:tabIndicatorColor="@color/textSettingsColor"
+        app:tabIndicatorFullWidth="true"
+        app:tabTextColor="@color/textSettingsColor" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
