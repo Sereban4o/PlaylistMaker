@@ -2,13 +2,11 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/search_activity"
-    style="@style/App"
-    android:background="@color/backgroundSettings">
+    style="@style/App">
 
     <Toolbar
         android:id="@+id/toolbar"
         style="@style/ToolBar"
-        android:navigationIcon="@drawable/arrow"
         android:title="@string/search"
         android:titleTextColor="@color/textSettingsColor" />
 
@@ -49,7 +47,8 @@
             android:contentDescription="@string/clearSearch"
             android:paddingEnd="12dp"
             android:src="@drawable/search_clear"
-            android:visibility="gone" />
+            android:visibility="visible"
+            android:background="@android:color/transparent"/>
     </FrameLayout>
 
     <ProgressBar
@@ -63,7 +62,7 @@
 
     <include
         android:id="@+id/viewHistoryTracks"
-        layout="@layout/history_tracks_view"
+        layout="@layout/fragment_history_tracks_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -71,7 +70,7 @@
 
     <include
         android:id="@+id/emptySearch"
-        layout="@layout/empty_search"
+        layout="@layout/fragment_empty_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="13dp"
@@ -79,7 +78,7 @@
 
     <include
         android:id="@+id/errorSearch"
-        layout="@layout/error_search"
+        layout="@layout/fragment_error_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="13dp"

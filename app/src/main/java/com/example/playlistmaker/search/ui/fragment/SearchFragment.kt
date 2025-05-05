@@ -1,43 +1,42 @@
-package com.example.playlistmaker.search.ui.activity
+package com.example.playlistmaker.search.ui.fragment
 
 import android.annotation.SuppressLint
-import android.content.Intent
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.inputmethod.InputMethodManager
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ProgressBar
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.TRACK_VIEW
-import com.example.playlistmaker.databinding.ActivitySearchBinding
-import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.player.ui.activity.TrackActivity
+import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.domain.state.TrackListHistoryState
 import com.example.playlistmaker.search.domain.state.TrackListState
 import com.example.playlistmaker.search.ui.adapter.HistoryTracksAdapter
 import com.example.playlistmaker.search.ui.adapter.TracksAdapter
 import com.example.playlistmaker.search.ui.view_model.SearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
-class SearchActivity : AppCompatActivity() {
-
+class SearchFragment : Fragment() {
     companion object {
         const val EDIT_TEXT = "EDIT_TEXT"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
     private val viewModel: SearchViewModel by viewModel()
-    private lateinit var binding: ActivitySearchBinding
     private lateinit var textWatcher: TextWatcher
     private var text: String = ""
     private lateinit var trackList: RecyclerView
@@ -51,50 +50,54 @@ class SearchActivity : AppCompatActivity() {
     private val tracksAdapter = TracksAdapter {
         if (clickDebounce()) {
             viewModel.addToHistory(it)
-            val intent = Intent(this, TrackActivity::class.java)
-            intent.putExtra(TRACK_VIEW, (it))
-            startActivity(intent)
+            findNavController().navigate(
+                R.id.action_searchFragment_to_trackActivity,
+                TrackActivity.createArgs(it)
+            )
         }
     }
     private val trackHistoryAdapter = HistoryTracksAdapter {
         if (clickDebounce()) {
-            val intent = Intent(this, TrackActivity::class.java)
-            intent.putExtra(TRACK_VIEW, (it))
-            startActivity(intent)
+            findNavController().navigate(
+                R.id.action_searchFragment_to_trackActivity,
+                TrackActivity.createArgs(it)
+            )
         }
     }
     private var isClickAllowed = true
+    private lateinit var binding: FragmentSearchBinding
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        enableEdgeToEdge()
-        ViewCompat.setOnApplyWindowInsetsListener(binding.searchActivity) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         inputEditText = binding.edit
         trackList = binding.trackList
-        trackList.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        trackList.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         trackList.adapter = tracksAdapter
         progressBar = binding.progressBar
         errorSearch = binding.errorSearch.root
         emptySearch = binding.emptySearch.root
         historyTrackList = binding.viewHistoryTracks.historyTrackList
         historyTrackList.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         historyTrackList.adapter = trackHistoryAdapter
         trackViewHistory = binding.viewHistoryTracks.root
 
-        viewModel.observeState().observe(this) {
+        viewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
         }
 
-        viewModel.observeHistoryState().observe(this) {
+        viewModel.observeHistoryState().observe(viewLifecycleOwner) {
             renderHistory(it)
         }
 
@@ -113,10 +116,6 @@ class SearchActivity : AppCompatActivity() {
         binding.viewHistoryTracks.clearHistory.setOnClickListener {
             viewModel.clearHistory()
             trackViewHistory.visibility = View.GONE
-        }
-
-        binding.toolbar.setNavigationOnClickListener {
-            finish()
         }
 
         if (savedInstanceState != null) {
@@ -155,8 +154,8 @@ class SearchActivity : AppCompatActivity() {
         textWatcher.let { inputEditText.addTextChangedListener(it) }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         textWatcher.let { inputEditText.removeTextChangedListener(it) }
     }
 
@@ -200,6 +199,7 @@ class SearchActivity : AppCompatActivity() {
         progressBar.isVisible = false
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun showContent(tracks: List<Track>) {
         trackViewHistory.isVisible = false
         trackList.isVisible = true
@@ -209,6 +209,7 @@ class SearchActivity : AppCompatActivity() {
         tracksAdapter.notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun showHistoryContent(tracks: List<Track>) {
         trackViewHistory.isVisible = tracks.isNotEmpty()
         trackHistoryAdapter.trackList.clear()
@@ -220,7 +221,10 @@ class SearchActivity : AppCompatActivity() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            handler.postDelayed(
+                { isClickAllowed = true },
+                CLICK_DEBOUNCE_DELAY
+            )
         }
         return current
     }
@@ -230,14 +234,8 @@ class SearchActivity : AppCompatActivity() {
         outState.putString(EDIT_TEXT, text)
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        text = savedInstanceState.getString(EDIT_TEXT).toString()
-    }
-
     private fun hideSoftKeyboard(view: View) {
-        val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val manager = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         manager.hideSoftInputFromWindow(view.windowToken, 0)
     }
-
 }

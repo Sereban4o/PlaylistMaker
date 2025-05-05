@@ -4,7 +4,7 @@
 
     <include
         android:id="@+id/favorite"
-        layout="@layout/favorite"
+        layout="@layout/fragment_favorite"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="13dp"
@@ -12,7 +12,7 @@
 
     <include
         android:id="@+id/playlists"
-        layout="@layout/playlists"
+        layout="@layout/fragment_playlists"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="13dp"

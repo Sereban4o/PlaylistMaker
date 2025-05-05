@@ -5,12 +5,12 @@ import android.os.Bundle
 import android.util.TypedValue
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.TRACK_VIEW
 import com.example.playlistmaker.databinding.ActivityTrackBinding
 import com.example.playlistmaker.player.domain.model.PlayStatus
 import com.example.playlistmaker.search.domain.models.Track
@@ -22,8 +22,16 @@ import java.util.Locale
 
 class TrackActivity : AppCompatActivity() {
 
+    companion object {
+
+        private const val TRACK_VIEW = "TRACK_VIEW"
+
+        fun createArgs(trackArg: Track): Bundle =
+            bundleOf(TRACK_VIEW to trackArg)
+    }
+
     private var track = Track()
-    private val viewModel: TrackViewModel by lazy{getViewModel { parametersOf(track) }}
+    private val viewModel: TrackViewModel by lazy { getViewModel { parametersOf(track) } }
     private lateinit var binding: ActivityTrackBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -5,15 +5,13 @@
     android:id="@+id/library"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundSettings"
     android:orientation="vertical"
-    tools:context=".library.ui.activity.LibraryActivity">
+    tools:context=".library.ui.fragment.LibraryFragment">
 
     <Toolbar
         android:id="@+id/toolbar"
         style="@style/ToolBar"
         android:layout_marginBottom="0dp"
-        android:navigationIcon="@drawable/arrow"
         android:title="@string/library"
         android:titleTextColor="@color/textSettingsColor" />
 
@@ -22,7 +20,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:background="@color/backgroundSettings"
         app:tabIndicatorColor="@color/textSettingsColor"
         app:tabIndicatorFullWidth="true"
         app:tabTextColor="@color/textSettingsColor" />

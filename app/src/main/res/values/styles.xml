@@ -37,7 +37,7 @@
         <item name="android:fontFamily">@font/ys_display_regular</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textFontWeight">400</item>
-        <item name="android:backgroundTint">@color/backgroundSettings</item>
+        <item name="android:backgroundTint">@color/background</item>
     </style>
 
     <style name="App">
@@ -84,5 +84,10 @@
         <item name="android:layout_marginStart">10dp</item>
         <item name="android:textAlignment">viewEnd</item>
         <item name="layout_constraintHorizontal_weight">1</item>
+    </style>
+
+    <style name="NavStyle" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/background</item>itemIconTint
+
     </style>
 </resources>
