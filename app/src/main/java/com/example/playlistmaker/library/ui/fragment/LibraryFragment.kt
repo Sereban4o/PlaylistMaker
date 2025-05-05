@@ -30,6 +30,19 @@ class LibraryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        renderTab()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        renderTab()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
+
+    private fun renderTab() {
         binding.viewPager.adapter =
             TabViewPageAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
 
@@ -41,10 +54,5 @@ class LibraryFragment : Fragment() {
             }
         }
         tabMediator.attach()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        tabMediator.detach()
     }
 }
