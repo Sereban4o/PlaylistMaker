@@ -50,6 +50,10 @@ class SearchViewModel(
         )
     }
 
+    fun clearSearch() {
+        stateLiveData.postValue(TrackListState.Content(tracks = mutableListOf<Track>()))
+    }
+
     fun observeState(): LiveData<TrackListState> = stateLiveData
     fun observeHistoryState(): LiveData<TrackListHistoryState> = stateHistoryLiveData
 

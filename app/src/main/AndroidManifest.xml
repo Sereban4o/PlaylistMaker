@@ -19,11 +19,11 @@
         <activity
             android:name=".player.ui.activity.TrackActivity"
             android:exported="false" />
-        <activity android:name=".root.ui.activity.RootActivity"
+        <activity
+            android:name=".root.ui.activity.RootActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/Base.Theme.PlaylistMaker"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

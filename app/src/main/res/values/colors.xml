@@ -30,4 +30,7 @@
     <color name="progressBar">#3772E7</color>
     <color name="lineNav">#E6E8EB</color>
     <color name="navText">#1A1B22</color>
+    <color name="tab">#1A1B22</color>
+    <color name="searchColor">#AEAFB4</color>
+    <color name="searchText">#1A1B22</color>
 </resources>

@@ -34,7 +34,7 @@
             android:singleLine="true"
             android:state_focused="true"
             android:textColor="@color/black"
-            android:textColorHint="@color/editText"
+            android:textColorHint="@color/searchText"
             android:textCursorDrawable="@drawable/cursor"
             android:textFontWeight="400"
             android:textSize="16sp" />

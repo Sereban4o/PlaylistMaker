@@ -4,7 +4,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.example.playlistmaker.library.ui.fragment.TabFragment
+import com.example.playlistmaker.library.ui.fragment.FavoriteFragment
+import com.example.playlistmaker.library.ui.fragment.PlaylistsFragment
 
 class TabViewPageAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
     FragmentStateAdapter(fragmentManager, lifecycle) {
@@ -14,8 +15,9 @@ class TabViewPageAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle)
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> TabFragment.newInstance(1)
-            else -> TabFragment.newInstance(position + 1)
+            0 -> FavoriteFragment.newInstance()
+            else -> PlaylistsFragment.newInstance()
         }
+
     }
 }

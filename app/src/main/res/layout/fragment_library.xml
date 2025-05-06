@@ -20,9 +20,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        app:tabIndicatorColor="@color/textSettingsColor"
+        android:background="@color/background"
+        app:tabIndicatorColor="@color/tab"
         app:tabIndicatorFullWidth="true"
-        app:tabTextColor="@color/textSettingsColor" />
+        app:tabTextColor="@color/tab" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"

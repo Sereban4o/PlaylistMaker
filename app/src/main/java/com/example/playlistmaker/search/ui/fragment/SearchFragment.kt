@@ -65,14 +65,15 @@ class SearchFragment : Fragment() {
         }
     }
     private var isClickAllowed = true
-    private lateinit var binding: FragmentSearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -92,7 +93,7 @@ class SearchFragment : Fragment() {
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         historyTrackList.adapter = trackHistoryAdapter
         trackViewHistory = binding.viewHistoryTracks.root
-
+        binding.clearIcon.isVisible = !inputEditText.text.isEmpty()
         viewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
         }
@@ -115,7 +116,7 @@ class SearchFragment : Fragment() {
 
         binding.viewHistoryTracks.clearHistory.setOnClickListener {
             viewModel.clearHistory()
-            trackViewHistory.visibility = View.GONE
+            trackViewHistory.isVisible = false
         }
 
         if (savedInstanceState != null) {
@@ -124,11 +125,12 @@ class SearchFragment : Fragment() {
 
         binding.clearIcon.setOnClickListener {
             inputEditText.setText("")
-            tracksAdapter.trackList.clear()
+            viewModel.clearSearch()
             errorSearch.isVisible = false
             emptySearch.isVisible = false
             tracksAdapter.notifyDataSetChanged()
             hideSoftKeyboard(it)
+            viewModel.searchHistory()
         }
 
         textWatcher = object : TextWatcher {
@@ -157,6 +159,7 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         textWatcher.let { inputEditText.removeTextChangedListener(it) }
+        _binding = null
     }
 
     private fun render(state: TrackListState) {
@@ -211,7 +214,7 @@ class SearchFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun showHistoryContent(tracks: List<Track>) {
-        trackViewHistory.isVisible = tracks.isNotEmpty()
+        trackViewHistory.isVisible = tracks.isNotEmpty() && inputEditText.text.isEmpty()
         trackHistoryAdapter.trackList.clear()
         trackHistoryAdapter.trackList.addAll(tracks)
         trackHistoryAdapter.notifyDataSetChanged()

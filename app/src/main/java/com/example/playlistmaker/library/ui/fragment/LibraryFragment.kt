@@ -15,7 +15,8 @@ import kotlin.getValue
 
 class LibraryFragment : Fragment() {
 
-    private lateinit var binding: FragmentLibraryBinding
+    private var _binding: FragmentLibraryBinding? = null
+    private val binding get() = _binding!!
     private lateinit var tabMediator: TabLayoutMediator
     private val viewModel: LibraryViewModel by viewModel()
 
@@ -24,7 +25,7 @@ class LibraryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentLibraryBinding.inflate(inflater, container, false)
+        _binding = FragmentLibraryBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -40,11 +41,13 @@ class LibraryFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        tabMediator.detach()
+        _binding = null
     }
 
     private fun renderTab() {
         binding.viewPager.adapter =
-            TabViewPageAdapter(childFragmentManager, viewLifecycleOwner.lifecycle)
+            TabViewPageAdapter(childFragmentManager, lifecycle)
 
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             when (position) {

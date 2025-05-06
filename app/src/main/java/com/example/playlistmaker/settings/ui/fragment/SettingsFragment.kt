@@ -14,7 +14,8 @@ import kotlin.getValue
 
 class SettingsFragment : Fragment() {
 
-    private lateinit var binding: FragmentSettingsBinding
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: SettingsViewModel by viewModel()
 
     override fun onCreateView(
@@ -22,7 +23,7 @@ class SettingsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -41,9 +42,9 @@ class SettingsFragment : Fragment() {
         binding.support.setOnClickListener {
             viewModel.openEmail(
                 EmailData(
-                    R.string.emailAddress.toString(),
-                    R.string.emailSubject.toString(),
-                    R.string.mailMessage.toString()
+                    getString(R.string.emailAddress),
+                    getString(R.string.emailSubject),
+                    getString(R.string.mailMessage)
                 )
             )
         }
@@ -55,5 +56,10 @@ class SettingsFragment : Fragment() {
         binding.switchTheme.setOnCheckedChangeListener { _, checked ->
             viewModel.updateThemeSetting(checked)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
