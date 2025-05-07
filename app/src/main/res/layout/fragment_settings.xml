@@ -4,13 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/App"
-    android:id="@+id/setting_activity"
-    android:background="@color/backgroundSettings">
+    android:id="@+id/setting_activity">
 
     <Toolbar
         android:id="@+id/toolbar"
         style="@style/ToolBar"
-        android:navigationIcon="@drawable/arrow"
         android:title="@string/settings"
         android:titleTextColor="@color/textSettingsColor" />
 

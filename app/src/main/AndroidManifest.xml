@@ -20,25 +20,12 @@
             android:name=".player.ui.activity.TrackActivity"
             android:exported="false" />
         <activity
-            android:name=".search.ui.activity.SearchActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".library.ui.activity.LibraryActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".settings.ui.activity.SettingsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".main.ui.activity.MainActivity"
+            android:name=".root.ui.activity.RootActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/Base.Theme.PlaylistMaker">
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

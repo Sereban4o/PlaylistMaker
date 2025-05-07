@@ -12,7 +12,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.search.domain.models.Track
 
 class TracksViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
-    LayoutInflater.from(parent.context).inflate(R.layout.track_view, parent, false)
+    LayoutInflater.from(parent.context).inflate(R.layout.fragment_track_view, parent, false)
 ) {
 
     private val trackName: TextView = itemView.findViewById(R.id.trackName)

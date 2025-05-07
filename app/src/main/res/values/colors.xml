@@ -3,9 +3,7 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="bg_button">#FFFFFF</color>
-    <color name="background">#3772E7</color>
-    <color name="backgroundSettings">#FFFFFF</color>
-    <color name="backgroundDark">#1A1B22</color>
+    <color name="background">#FFFFFF</color>
     <color name="title">#FFFFFF</color>
     <color name="text_button">#000000</color>
     <color name="iconTint">#000000</color>
@@ -30,4 +28,9 @@
     <color name="trackButtonSub">#ffffff</color>
     <color name="trackName">#1A1B22</color>
     <color name="progressBar">#3772E7</color>
+    <color name="lineNav">#E6E8EB</color>
+    <color name="navText">#1A1B22</color>
+    <color name="tab">#1A1B22</color>
+    <color name="searchColor">#AEAFB4</color>
+    <color name="searchText">#1A1B22</color>
 </resources>

@@ -32,7 +32,7 @@ class ExternalNavigatorImpl(private val app: Application) : ExternalNavigatorInt
         val intent = Intent(Intent.ACTION_SENDTO)
         intent.data = "mailto:".toUri()
         intent.putExtra(Intent.EXTRA_EMAIL, emailData.emailAddress)
-        intent.putExtra(Intent.EXTRA_TEXT, emailData.subject)
+        intent.putExtra(Intent.EXTRA_SUBJECT, emailData.subject)
         intent.putExtra(Intent.EXTRA_TEXT, emailData.messageBody)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         app.startActivity(intent)
