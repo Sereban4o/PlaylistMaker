@@ -1,17 +1,18 @@
 package com.example.playlistmaker.search.ui.view_model
 
 import android.app.Application
-import android.os.Handler
-import android.os.Looper
-import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.R
 import com.example.playlistmaker.search.domain.interactor.SearchInteractor
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.domain.state.TrackListHistoryState
 import com.example.playlistmaker.search.domain.state.TrackListState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     application: Application,
@@ -20,34 +21,27 @@ class SearchViewModel(
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private val SEARCH_REQUEST_TOKEN = Any()
     }
 
-    private val handler = Handler(Looper.getMainLooper())
     private var stateLiveData = MutableLiveData<TrackListState>()
     private var stateHistoryLiveData = MutableLiveData<TrackListHistoryState>()
     private var searchText: String? = ""
+    private var searchJob: Job? = null
 
-    override fun onCleared() {
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
-    }
 
     fun searchDebounce(changedText: String) {
-        if (changedText == searchText) {
+
+        if (searchText == changedText) {
             return
         }
 
-        this.searchText = changedText
+        searchText = changedText
 
-        handler.removeCallbacksAndMessages(SEARCH_REQUEST_TOKEN)
-        val searchRunnable = Runnable { searchTracks(changedText) }
-
-        val postTime = SystemClock.uptimeMillis() + SEARCH_DEBOUNCE_DELAY
-        handler.postAtTime(
-            searchRunnable,
-            SEARCH_REQUEST_TOKEN,
-            postTime,
-        )
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_DELAY)
+            searchTracks(changedText)
+        }
     }
 
     fun clearSearch() {
@@ -58,57 +52,46 @@ class SearchViewModel(
     fun observeHistoryState(): LiveData<TrackListHistoryState> = stateHistoryLiveData
 
     private fun searchTracks(expression: String) {
-        if (expression.isEmpty()) {
-            return
-        }
-        stateLiveData.postValue(TrackListState.Loading)
-
-        searchInteractor.searchTracks(
-            expression, object :
-                SearchInteractor.TracksConsumer {
-
-                override fun consume(
-                    foundTracks: List<Track>?,
-                    errorMessage: String?
-                ) {
-
-                    val tracks = mutableListOf<Track>()
-                    if (foundTracks != null) {
-                        tracks.addAll(foundTracks)
-                    }
-
-                    when {
-                        errorMessage != null -> {
-                            renderState(
-                                TrackListState.Error(
-                                    errorMessage = getApplication<Application>().getString(R.string.errorSearch)
-                                )
-                            )
-
+        if (expression.isNotEmpty()) {
+            stateLiveData.postValue(TrackListState.Loading)
+            viewModelScope.launch {
+                searchInteractor.searchTracks(expression)
+                    .collect { pair ->
+                        val tracks = mutableListOf<Track>()
+                        val foundTracks = pair.first
+                        val errorMessage = pair.second
+                        if (foundTracks != null) {
+                            tracks.addAll(foundTracks)
                         }
 
-                        tracks.isEmpty() -> {
-                            renderState(
-                                TrackListState.Empty(
-                                    emptyMessage = getApplication<Application>().getString(R.string.emptySearch)
+                        when {
+                            errorMessage != null -> {
+                                renderState(
+                                    TrackListState.Error(
+                                        errorMessage = getApplication<Application>().getString(R.string.errorSearch)
+                                    )
                                 )
-                            )
-                        }
+                            }
 
-                        else -> {
-                            renderState(
-                                TrackListState.Content(
-                                    tracks = tracks
+                            tracks.isEmpty() -> {
+                                renderState(
+                                    TrackListState.Empty(
+                                        emptyMessage = getApplication<Application>().getString(R.string.emptySearch)
+                                    )
                                 )
-                            )
+                            }
+
+                            else -> {
+                                renderState(
+                                    TrackListState.Content(
+                                        tracks = tracks
+                                    )
+                                )
+                            }
                         }
                     }
-
-                }
             }
-
-
-        )
+        }
     }
 
     fun searchHistory() {

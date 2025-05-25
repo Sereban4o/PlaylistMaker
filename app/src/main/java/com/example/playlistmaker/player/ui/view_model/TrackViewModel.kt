@@ -1,13 +1,15 @@
 package com.example.playlistmaker.player.ui.view_model
 
 import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.player.domain.model.PlayStatus
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class TrackViewModel(
     private val track: Track
@@ -18,13 +20,13 @@ class TrackViewModel(
         private const val STATE_PREPARED = 1
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
-        private const val DELAY = 100L
+        private const val DELAY = 300L
     }
 
     private var mediaPlayer = MediaPlayer()
     private var playerState = STATE_DEFAULT
     private val playStatusLiveData = MutableLiveData<PlayStatus>()
-    private var mainThreadHandler: Handler = Handler(Looper.getMainLooper())
+    private var playerJob: Job? = null
 
 
     fun observeState(): LiveData<PlayStatus> = playStatusLiveData
@@ -38,24 +40,16 @@ class TrackViewModel(
     }
 
     private fun startTimer() {
-
-        mainThreadHandler.post(
-            createUpdateTimerTask()
-        )
-    }
-
-    private fun createUpdateTimerTask(): Runnable {
-        return object : Runnable {
-            override fun run() {
-                if (playStatusLiveData.value?.state == STATE_PLAYING) {
-                    playStatusLiveData.value =
-                        getCurrentPlayStatus().copy(progress = mediaPlayer.currentPosition.toFloat())
-                    mainThreadHandler.postDelayed(this, DELAY)
-                }
+        playerJob?.cancel()
+        playerJob = viewModelScope.launch {
+            while (mediaPlayer.isPlaying) {
+                delay(DELAY)
+                playStatusLiveData.value =
+                    getCurrentPlayStatus().copy(progress = mediaPlayer.currentPosition.toFloat())
             }
-
         }
     }
+
 
     fun pause() {
         mediaPlayer.pause()
@@ -65,6 +59,7 @@ class TrackViewModel(
 
     override fun onCleared() {
         super.onCleared()
+        playerJob?.cancel()
         mediaPlayer.release()
         playStatusLiveData.value =
             PlayStatus(progress = 0f, isPlaying = false, state = STATE_DEFAULT)
@@ -82,6 +77,7 @@ class TrackViewModel(
                 PlayStatus(progress = 0f, isPlaying = false, state = STATE_PREPARED)
         }
         mediaPlayer.setOnCompletionListener {
+            playerJob?.cancel()
             playStatusLiveData.value =
                 PlayStatus(progress = 0f, isPlaying = false, state = STATE_PREPARED)
         }
