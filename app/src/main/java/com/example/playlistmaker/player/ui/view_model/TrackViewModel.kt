@@ -59,6 +59,7 @@ class TrackViewModel(
 
     override fun onCleared() {
         super.onCleared()
+        playerJob?.cancel()
         mediaPlayer.release()
         playStatusLiveData.value =
             PlayStatus(progress = 0f, isPlaying = false, state = STATE_DEFAULT)
