@@ -64,7 +64,7 @@
         android:id="@+id/viewHistoryTracks"
         layout="@layout/fragment_history_tracks_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginTop="24dp"
         android:visibility="gone" />
 

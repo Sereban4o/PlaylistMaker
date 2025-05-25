@@ -1,13 +1,15 @@
 package com.example.playlistmaker.player.ui.view_model
 
 import android.media.MediaPlayer
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.player.domain.model.PlayStatus
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class TrackViewModel(
     private val track: Track
@@ -24,7 +26,7 @@ class TrackViewModel(
     private var mediaPlayer = MediaPlayer()
     private var playerState = STATE_DEFAULT
     private val playStatusLiveData = MutableLiveData<PlayStatus>()
-    private var mainThreadHandler: Handler = Handler(Looper.getMainLooper())
+    private var playerJob: Job? = null
 
 
     fun observeState(): LiveData<PlayStatus> = playStatusLiveData
@@ -39,23 +41,15 @@ class TrackViewModel(
 
     private fun startTimer() {
 
-        mainThreadHandler.post(
-            createUpdateTimerTask()
-        )
-    }
-
-    private fun createUpdateTimerTask(): Runnable {
-        return object : Runnable {
-            override fun run() {
-                if (playStatusLiveData.value?.state == STATE_PLAYING) {
-                    playStatusLiveData.value =
-                        getCurrentPlayStatus().copy(progress = mediaPlayer.currentPosition.toFloat())
-                    mainThreadHandler.postDelayed(this, DELAY)
-                }
+        playerJob = viewModelScope.launch {
+            while (mediaPlayer.isPlaying) {
+                delay(100L)
+                playStatusLiveData.value =
+                    getCurrentPlayStatus().copy(progress = mediaPlayer.currentPosition.toFloat())
             }
-
         }
     }
+
 
     fun pause() {
         mediaPlayer.pause()

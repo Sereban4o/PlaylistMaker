@@ -15,6 +15,7 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +28,8 @@ import com.example.playlistmaker.search.domain.state.TrackListState
 import com.example.playlistmaker.search.ui.adapter.HistoryTracksAdapter
 import com.example.playlistmaker.search.ui.adapter.TracksAdapter
 import com.example.playlistmaker.search.ui.view_model.SearchViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
@@ -46,7 +49,6 @@ class SearchFragment : Fragment() {
     private lateinit var historyTrackList: RecyclerView
     private lateinit var trackViewHistory: View
     private lateinit var inputEditText: EditText
-    private val handler = Handler(Looper.getMainLooper())
     private val tracksAdapter = TracksAdapter {
         if (clickDebounce()) {
             viewModel.addToHistory(it)
@@ -224,10 +226,11 @@ class SearchFragment : Fragment() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed(
-                { isClickAllowed = true },
-                CLICK_DEBOUNCE_DELAY
-            )
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
+
         }
         return current
     }
