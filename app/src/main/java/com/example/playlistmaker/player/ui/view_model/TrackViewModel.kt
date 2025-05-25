@@ -20,7 +20,7 @@ class TrackViewModel(
         private const val STATE_PREPARED = 1
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
-        private const val DELAY = 100L
+        private const val DELAY = 300L
     }
 
     private var mediaPlayer = MediaPlayer()
@@ -40,10 +40,10 @@ class TrackViewModel(
     }
 
     private fun startTimer() {
-
+        playerJob?.cancel()
         playerJob = viewModelScope.launch {
             while (mediaPlayer.isPlaying) {
-                delay(100L)
+                delay(DELAY)
                 playStatusLiveData.value =
                     getCurrentPlayStatus().copy(progress = mediaPlayer.currentPosition.toFloat())
             }
@@ -77,6 +77,7 @@ class TrackViewModel(
                 PlayStatus(progress = 0f, isPlaying = false, state = STATE_PREPARED)
         }
         mediaPlayer.setOnCompletionListener {
+            playerJob?.cancel()
             playStatusLiveData.value =
                 PlayStatus(progress = 0f, isPlaying = false, state = STATE_PREPARED)
         }

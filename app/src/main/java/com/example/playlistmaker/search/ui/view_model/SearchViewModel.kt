@@ -58,12 +58,14 @@ class SearchViewModel(
                 searchInteractor.searchTracks(expression)
                     .collect { pair ->
                         val tracks = mutableListOf<Track>()
-                        if (pair.first != null) {
-                            tracks.addAll(pair.first!!)
+                        val foundTracks = pair.first
+                        val errorMessage = pair.second
+                        if (foundTracks != null) {
+                            tracks.addAll(foundTracks)
                         }
 
                         when {
-                            pair.second != null -> {
+                            errorMessage != null -> {
                                 renderState(
                                     TrackListState.Error(
                                         errorMessage = getApplication<Application>().getString(R.string.errorSearch)
