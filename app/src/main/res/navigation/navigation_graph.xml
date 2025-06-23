@@ -17,16 +17,26 @@
     <fragment
         android:id="@+id/libraryFragment"
         android:name="com.example.playlistmaker.library.ui.fragment.LibraryFragment"
-        android:label="fragment_search"
-        tools:layout="@layout/fragment_library"/>
+        android:label="fragment_library"
+        tools:layout="@layout/fragment_library">
+        <action
+            android:id="@+id/action_libraryFragment_to_trackActivity"
+            app:destination="@id/trackActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.example.playlistmaker.favorites.ui.fragment.FavoritesFragment"
+        android:label="fragment_favorites"
+        tools:layout="@layout/fragment_favorites">
+    </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.playlistmaker.settings.ui.fragment.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings"/>
+        tools:layout="@layout/fragment_settings" />
     <activity
         android:id="@+id/trackActivity"
         android:name="com.example.playlistmaker.player.ui.activity.TrackActivity"
         android:label="fragment_settings"
-        tools:layout="@layout/activity_track"/>
+        tools:layout="@layout/activity_track" />
 </navigation>

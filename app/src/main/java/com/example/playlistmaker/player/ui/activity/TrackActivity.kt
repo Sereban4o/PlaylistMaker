@@ -34,6 +34,7 @@ class TrackActivity : AppCompatActivity() {
     private val viewModel: TrackViewModel by lazy { getViewModel { parametersOf(track) } }
     private lateinit var binding: ActivityTrackBinding
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTrackBinding.inflate(layoutInflater)
@@ -51,16 +52,24 @@ class TrackActivity : AppCompatActivity() {
             render(it)
         }
 
-        binding.trackName.text = track?.trackName
-        binding.artistName.text = track?.artistName
-        binding.trackTimeMills.text = track?.trackTimeMillis
-        binding.collectionName.text = track?.collectionName
-        binding.releaseDate.text = track?.releaseDate
-        binding.country.text = track?.country
-        binding.primaryGenreName.text = track?.primaryGenreName
+        viewModel.observeFavorite().observe(this) {
+            if (it) {
+                binding.addFavoriteButton.setImageDrawable(getDrawable(R.drawable.favorite))
+            } else {
+                binding.addFavoriteButton.setImageDrawable(getDrawable(R.drawable.add_favorite))
+            }
+        }
+
+        binding.trackName.text = track.trackName
+        binding.artistName.text = track.artistName
+        binding.trackTimeMills.text = track.trackTimeMillis
+        binding.collectionName.text = track.collectionName
+        binding.releaseDate.text = track.releaseDate
+        binding.country.text = track.country
+        binding.primaryGenreName.text = track.primaryGenreName
 
         Glide.with(this)
-            .load(track?.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg"))
+            .load(track.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg"))
             .placeholder(R.drawable.placeholder_big)
             .centerCrop()
             .transform(
@@ -82,6 +91,10 @@ class TrackActivity : AppCompatActivity() {
 
         binding.playButton.setOnClickListener {
             viewModel.playbackControl()
+        }
+
+        binding.addFavoriteButton.setOnClickListener {
+            viewModel.editFavorite(track)
         }
     }
 

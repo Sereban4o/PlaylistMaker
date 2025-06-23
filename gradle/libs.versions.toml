@@ -1,23 +1,26 @@
 [versions]
-agp = "8.10.0"
-kotlin = "1.9.0"
-coreKtx = "1.15.0"
+agp = "8.10.1"
+kotlin = "2.1.21"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-appcompat = "1.7.0"
+appcompat = "1.7.1"
 material = "1.12.0"
-activity = "1.10.0"
-constraintlayout = "2.2.0"
+activity = "1.10.1"
+constraintlayout = "2.2.1"
 glide = "4.16.0"
 gson = "2.11.0"
 retrofit = "2.11.0"
 converter-gson = "2.11.0"
 koin-bom = "3.3.0"
-fragment_version = "1.5.6"
-navigation-fragment = "2.5.3"
-navigation-ui = "2.5.3"
+fragment_version = "1.8.8"
+navigation-fragment = "2.9.0"
+navigation-ui = "2.9.0"
 coroutines-ver = "1.7.3"
+room_version = "2.7.1"
+ksp_verion = "2.1.21-2.0.1"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,10 +41,15 @@ fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref
 navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation-fragment"}
 navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation-ui"}
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines-ver"}
+room-runtime = {group = "androidx.room", name = "room-runtime", version.ref = "room_version"}
+room-compiler = {group = "androidx.room", name = "room-compiler", version.ref = "room_version"}
+room-ktx = {group = "androidx.room", name = "room-ktx", version.ref = "room_version"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "kotlin-parcelize" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp_verion"}
+
 
 

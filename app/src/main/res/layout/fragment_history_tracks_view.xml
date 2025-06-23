@@ -23,7 +23,8 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="13dp"
         android:layout_marginTop="8dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+         />
 
     <Button
         android:id="@+id/clearHistory"
@@ -36,6 +37,9 @@
         android:text="@string/cleanHistory"
         android:textColor="@color/clearButtonText"
         android:textFontWeight="500"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+
+
+        />
 
 </LinearLayout>

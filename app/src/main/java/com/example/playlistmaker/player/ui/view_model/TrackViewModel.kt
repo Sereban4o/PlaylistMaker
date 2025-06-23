@@ -5,14 +5,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.favorites.domain.interactor.FavoritesInteractor
 import com.example.playlistmaker.player.domain.model.PlayStatus
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.utils.SingleEventLiveData
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class TrackViewModel(
-    private val track: Track
+    private val track: Track,
+    private val favoritesInteractor: FavoritesInteractor
 ) : ViewModel() {
 
     companion object {
@@ -26,12 +29,19 @@ class TrackViewModel(
     private var mediaPlayer = MediaPlayer()
     private var playerState = STATE_DEFAULT
     private val playStatusLiveData = MutableLiveData<PlayStatus>()
+    private val inFavorite = SingleEventLiveData<Boolean>()
     private var playerJob: Job? = null
 
+    init {
+        viewModelScope.launch {
+            checkFavorite(track)
+        }
+    }
 
     fun observeState(): LiveData<PlayStatus> = playStatusLiveData
+    fun observeFavorite(): LiveData<Boolean> = inFavorite
 
-    fun play() {
+    private fun play() {
         mediaPlayer.start()
         playerState = STATE_PLAYING
         playStatusLiveData.value =
@@ -50,8 +60,7 @@ class TrackViewModel(
         }
     }
 
-
-    fun pause() {
+    private fun pause() {
         mediaPlayer.pause()
         playStatusLiveData.value =
             getCurrentPlayStatus().copy(isPlaying = false, state = STATE_PAUSED)
@@ -93,8 +102,6 @@ class TrackViewModel(
     }
 
     fun playbackControl() {
-
-
         when (playStatusLiveData.value?.state) {
             STATE_PLAYING -> {
                 pause()
@@ -102,8 +109,32 @@ class TrackViewModel(
 
             STATE_PREPARED, STATE_PAUSED -> {
                 play()
-
             }
+        }
+    }
+
+    fun editFavorite(track: Track) {
+        viewModelScope.launch {
+            if (inFavorite.value == true) {
+                deleteFavoriteSuspend(track)
+            } else {
+                addFavoriteSuspend(track)
+            }
+            checkFavorite(track)
+        }
+    }
+
+    private suspend fun addFavoriteSuspend(track: Track) {
+        favoritesInteractor.addFavorite(track)
+    }
+
+    private suspend fun deleteFavoriteSuspend(track: Track) {
+        track.trackId?.let { favoritesInteractor.deleteFavorite(it) }
+    }
+
+    private suspend fun checkFavorite(track: Track) {
+        inFavorite.value = track.trackId?.let {
+            favoritesInteractor.checkFavorite(it)
         }
     }
 }
