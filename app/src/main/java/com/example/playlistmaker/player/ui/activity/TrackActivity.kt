@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityTrackBinding
-import com.example.playlistmaker.player.domain.model.PlayStatus
+import com.example.playlistmaker.player.domain.model.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.player.ui.view_model.TrackViewModel
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -50,14 +50,6 @@ class TrackActivity : AppCompatActivity() {
 
         viewModel.observeState().observe(this) {
             render(it)
-        }
-
-        viewModel.observeFavorite().observe(this) {
-            if (it) {
-                binding.addFavoriteButton.setImageDrawable(getDrawable(R.drawable.favorite))
-            } else {
-                binding.addFavoriteButton.setImageDrawable(getDrawable(R.drawable.add_favorite))
-            }
         }
 
         binding.trackName.text = track.trackName
@@ -99,12 +91,18 @@ class TrackActivity : AppCompatActivity() {
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun render(state: PlayStatus) {
+    private fun render(state: PlayerState) {
         if (state.isPlaying) {
             binding.playButton.setImageDrawable(getDrawable(R.drawable.pause))
         } else {
             binding.playButton.setImageDrawable(getDrawable(R.drawable.play))
         }
         binding.time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(state.progress)
+
+        if (state.inFavorite) {
+            binding.addFavoriteButton.setImageDrawable(getDrawable(R.drawable.favorite))
+        } else {
+            binding.addFavoriteButton.setImageDrawable(getDrawable(R.drawable.add_favorite))
+        }
     }
 }

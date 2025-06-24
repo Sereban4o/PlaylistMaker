@@ -6,9 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.favorites.domain.interactor.FavoritesInteractor
-import com.example.playlistmaker.player.domain.model.PlayStatus
+import com.example.playlistmaker.player.domain.model.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
-import com.example.playlistmaker.utils.SingleEventLiveData
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -27,10 +26,9 @@ class TrackViewModel(
     }
 
     private var mediaPlayer = MediaPlayer()
-    private var playerState = STATE_DEFAULT
-    private val playStatusLiveData = MutableLiveData<PlayStatus>()
-    private val inFavorite = SingleEventLiveData<Boolean>()
+    private val playerStateLiveData = MutableLiveData<PlayerState>()
     private var playerJob: Job? = null
+    private var inFavorite: Boolean = false
 
     init {
         viewModelScope.launch {
@@ -38,14 +36,12 @@ class TrackViewModel(
         }
     }
 
-    fun observeState(): LiveData<PlayStatus> = playStatusLiveData
-    fun observeFavorite(): LiveData<Boolean> = inFavorite
+    fun observeState(): LiveData<PlayerState> = playerStateLiveData
 
     private fun play() {
         mediaPlayer.start()
-        playerState = STATE_PLAYING
-        playStatusLiveData.value =
-            getCurrentPlayStatus().copy(isPlaying = true, state = STATE_PLAYING)
+        playerStateLiveData.value =
+            getCurrentPlayerState().copy(isPlaying = true, state = STATE_PLAYING)
         startTimer()
     }
 
@@ -54,24 +50,29 @@ class TrackViewModel(
         playerJob = viewModelScope.launch {
             while (mediaPlayer.isPlaying) {
                 delay(DELAY)
-                playStatusLiveData.value =
-                    getCurrentPlayStatus().copy(progress = mediaPlayer.currentPosition.toFloat())
+                playerStateLiveData.value =
+                    getCurrentPlayerState().copy(progress = mediaPlayer.currentPosition.toFloat())
             }
         }
     }
 
     private fun pause() {
         mediaPlayer.pause()
-        playStatusLiveData.value =
-            getCurrentPlayStatus().copy(isPlaying = false, state = STATE_PAUSED)
+        playerStateLiveData.value =
+            getCurrentPlayerState().copy(isPlaying = false, state = STATE_PAUSED)
     }
 
     override fun onCleared() {
         super.onCleared()
         playerJob?.cancel()
         mediaPlayer.release()
-        playStatusLiveData.value =
-            PlayStatus(progress = 0f, isPlaying = false, state = STATE_DEFAULT)
+        playerStateLiveData.value =
+            PlayerState(
+                progress = 0f,
+                isPlaying = false,
+                state = STATE_DEFAULT,
+                inFavorite = inFavorite
+            )
     }
 
     fun release() {
@@ -82,27 +83,37 @@ class TrackViewModel(
         mediaPlayer.setDataSource(track.previewUrl.toString())
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            playStatusLiveData.value =
-                PlayStatus(progress = 0f, isPlaying = false, state = STATE_PREPARED)
+            playerStateLiveData.value =
+                PlayerState(
+                    progress = 0f,
+                    isPlaying = false,
+                    state = STATE_PREPARED,
+                    inFavorite = inFavorite
+                )
         }
         mediaPlayer.setOnCompletionListener {
             playerJob?.cancel()
-            playStatusLiveData.value =
-                PlayStatus(progress = 0f, isPlaying = false, state = STATE_PREPARED)
+            playerStateLiveData.value =
+                PlayerState(
+                    progress = 0f,
+                    isPlaying = false,
+                    state = STATE_PREPARED,
+                    inFavorite = inFavorite
+                )
         }
 
     }
 
-    private fun getCurrentPlayStatus(): PlayStatus {
-        return playStatusLiveData.value ?: PlayStatus(
+    private fun getCurrentPlayerState(): PlayerState {
+        return playerStateLiveData.value ?: PlayerState(
             progress = 0f,
             isPlaying = false,
-            state = STATE_PREPARED
+            state = STATE_PREPARED, inFavorite = inFavorite
         )
     }
 
     fun playbackControl() {
-        when (playStatusLiveData.value?.state) {
+        when (playerStateLiveData.value?.state) {
             STATE_PLAYING -> {
                 pause()
             }
@@ -115,7 +126,7 @@ class TrackViewModel(
 
     fun editFavorite(track: Track) {
         viewModelScope.launch {
-            if (inFavorite.value == true) {
+            if (inFavorite) {
                 deleteFavoriteSuspend(track)
             } else {
                 addFavoriteSuspend(track)
@@ -133,8 +144,10 @@ class TrackViewModel(
     }
 
     private suspend fun checkFavorite(track: Track) {
-        inFavorite.value = track.trackId?.let {
+        inFavorite = track.trackId?.let {
             favoritesInteractor.checkFavorite(it)
-        }
+        } == true
+        playerStateLiveData.value =
+            getCurrentPlayerState().copy(inFavorite = inFavorite)
     }
 }
