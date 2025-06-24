@@ -6,6 +6,15 @@
     android:orientation="vertical"
     android:id="@+id/favorite">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="140dp"
+        android:indeterminateTint="@color/progressBar"
+        android:visibility="gone" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,6 +26,15 @@
         android:textColor="@color/textSettingsColor"
         android:textFontWeight="400"
         android:textSize="19sp"
-        app:drawableTopCompat="@drawable/empty_search" />
+        app:drawableTopCompat="@drawable/empty_search"
+        android:visibility="gone"
+        android:id="@+id/placeholderMessage"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favoritesList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="13dp"
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>
