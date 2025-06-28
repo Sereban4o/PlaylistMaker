@@ -34,10 +34,17 @@ class RootActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.activity_track -> {
                     binding.bottomNavigationView.isVisible = false
+                    binding.line.isVisible = false
+                }
+
+                R.id.createPlaylistFragment -> {
+                    binding.bottomNavigationView.isVisible = false
+                    binding.line.isVisible = false
                 }
 
                 else -> {
                     binding.bottomNavigationView.isVisible = true
+                    binding.line.isVisible = true
                 }
             }
         }

@@ -1,5 +1,5 @@
 [versions]
-agp = "8.10.1"
+agp = "8.11.0"
 kotlin = "2.1.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -20,6 +20,7 @@ navigation-ui = "2.9.0"
 coroutines-ver = "1.7.3"
 room_version = "2.7.1"
 ksp_verion = "2.1.21-2.0.1"
+peko_verion = "3.0.5"
 
 
 [libraries]
@@ -44,6 +45,7 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 room-runtime = {group = "androidx.room", name = "room-runtime", version.ref = "room_version"}
 room-compiler = {group = "androidx.room", name = "room-compiler", version.ref = "room_version"}
 room-ktx = {group = "androidx.room", name = "room-ktx", version.ref = "room_version"}
+peko = {group = "com.markodevcic", name = "peko", version.ref = "peko_verion"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

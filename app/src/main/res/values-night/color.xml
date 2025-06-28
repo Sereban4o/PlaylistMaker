@@ -33,4 +33,11 @@
     <color name="tab">#FFFFFF</color>
     <color name="searchColor">#1A1B22</color>
     <color name="searchText">#000000</color>
+    <color name="playlistEdit">#FFFFFF</color>
+    <color name="playlistEditText">#FFFFFF</color>
+    <color name="playlistEditFill">#3772E7</color>
+    <color name="playlistButtonCreateInactive">#AEAFB4</color>
+    <color name="playlistButtonCreateActive">#3772E7</color>
+    <color name="rectangle">#FFFFFF</color>
+    <color name="tracksPlaylistText">#FFFFFF</color>
 </resources>

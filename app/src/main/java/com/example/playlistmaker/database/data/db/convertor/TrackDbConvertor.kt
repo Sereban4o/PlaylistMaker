@@ -1,4 +1,4 @@
-package com.example.playlistmaker.database.data.db
+package com.example.playlistmaker.database.data.db.convertor
 
 import com.example.playlistmaker.database.data.db.entity.TrackFavoriteEntity
 import com.example.playlistmaker.search.domain.models.Track
@@ -34,6 +34,4 @@ class TrackDbConvertor {
             track.previewUrl
         )
     }
-
-
 }
