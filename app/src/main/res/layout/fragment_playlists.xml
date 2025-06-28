@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/playlists"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:id="@+id/playlists">
+    android:orientation="vertical">
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -14,7 +14,6 @@
         android:layout_marginTop="140dp"
         android:indeterminateTint="@color/progressBar"
         android:visibility="gone" />
-
 
     <Button
         android:id="@+id/createNewPlaylist"
@@ -27,14 +26,14 @@
         android:text="@string/new_playlist"
         android:textColor="@color/refreshButtonText"
         android:textFontWeight="500"
-        android:textSize="14sp"    />
+        android:textSize="14sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
-        android:layout_marginHorizontal="12dp"/>
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="16dp" />
 
     <TextView
         android:id="@+id/placeholderMessage"
@@ -48,7 +47,7 @@
         android:textColor="@color/textSettingsColor"
         android:textFontWeight="400"
         android:textSize="19sp"
-        app:drawableTopCompat="@drawable/empty_search"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:drawableTopCompat="@drawable/empty_search" />
 
 </LinearLayout>

@@ -3,8 +3,8 @@
     android:id="@+id/playlist"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="8dp"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingVertical="8dp">
 
     <ImageView
         android:id="@+id/playlistImage"
@@ -33,23 +33,15 @@
             android:textFontWeight="400"
             android:textSize="16sp" />
 
-
-
-            <TextView
-                android:id="@+id/countTracks"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/tracksPlaylistText"
-android:fontFamily="@font/ys_display_medium"
-android:textSize="11sp"
-                android:textFontWeight="400"
-                android:ellipsize="end" />
-
-
-
-
+        <TextView
+            android:id="@+id/countTracks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="@font/ys_display_medium"
+            android:textColor="@color/tracksPlaylistText"
+            android:textFontWeight="400"
+            android:textSize="11sp" />
 
     </LinearLayout>
-
-
 </LinearLayout>
