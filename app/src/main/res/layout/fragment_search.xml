@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/search_activity"
     style="@style/App">
@@ -44,11 +43,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
+            android:background="@android:color/transparent"
             android:contentDescription="@string/clearSearch"
             android:paddingEnd="12dp"
             android:src="@drawable/search_clear"
-            android:visibility="visible"
-            android:background="@android:color/transparent"/>
+            android:visibility="visible" />
     </FrameLayout>
 
     <ProgressBar

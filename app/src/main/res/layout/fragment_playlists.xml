@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/playlists"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:id="@+id/playlists">
+    android:orientation="vertical">
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="140dp"
+        android:indeterminateTint="@color/progressBar"
+        android:visibility="gone" />
 
     <Button
-        android:id="@+id/errorButtonRefresh"
+        android:id="@+id/createNewPlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center"
         android:layout_marginTop="24dp"
-        android:layout_marginBottom="46dp"
         android:backgroundTint="@color/refreshButtonBackground"
         android:fontFamily="@font/ys_display_medium"
         android:text="@string/new_playlist"
@@ -20,16 +28,26 @@
         android:textFontWeight="500"
         android:textSize="14sp" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="16dp" />
+
     <TextView
+        android:id="@+id/placeholderMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="46dp"
         android:fontFamily="@font/ys_display_medium"
         android:gravity="center"
         android:text="@string/empty_playlists"
         android:textColor="@color/textSettingsColor"
         android:textFontWeight="400"
         android:textSize="19sp"
+        android:visibility="gone"
         app:drawableTopCompat="@drawable/empty_search" />
 
 </LinearLayout>

@@ -1,12 +1,16 @@
 package com.example.playlistmaker.player.ui.view_model
 
+import android.app.Application
 import android.media.MediaPlayer
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.R
 import com.example.playlistmaker.favorites.domain.interactor.FavoritesInteractor
 import com.example.playlistmaker.player.domain.model.PlayerState
+import com.example.playlistmaker.playlists.domain.interactor.PlaylistInteractor
+import com.example.playlistmaker.playlists.domain.model.Playlist
 import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -14,8 +18,11 @@ import kotlinx.coroutines.launch
 
 class TrackViewModel(
     private val track: Track,
-    private val favoritesInteractor: FavoritesInteractor
-) : ViewModel() {
+    application: Application,
+    private val favoritesInteractor: FavoritesInteractor,
+    private val playlistInteractor: PlaylistInteractor,
+    private val mediaPlayer: MediaPlayer
+) : AndroidViewModel(application) {
 
     companion object {
         private const val STATE_DEFAULT = 0
@@ -25,14 +32,22 @@ class TrackViewModel(
         private const val DELAY = 300L
     }
 
-    private var mediaPlayer = MediaPlayer()
     private val playerStateLiveData = MutableLiveData<PlayerState>()
     private var playerJob: Job? = null
-    private var inFavorite: Boolean = false
 
     init {
         viewModelScope.launch {
             checkFavorite(track)
+            playlistInteractor.getPlaylists().collect { result ->
+                processResult(result)
+            }
+        }
+    }
+
+    private fun processResult(result: List<Playlist>) {
+        if (result.isNotEmpty()) {
+            playerStateLiveData.value =
+                getCurrentPlayerState().copy(playlists = result)
         }
     }
 
@@ -67,12 +82,7 @@ class TrackViewModel(
         playerJob?.cancel()
         mediaPlayer.release()
         playerStateLiveData.value =
-            PlayerState(
-                progress = 0f,
-                isPlaying = false,
-                state = STATE_DEFAULT,
-                inFavorite = inFavorite
-            )
+            getCurrentPlayerState().copy(progress = 0f, isPlaying = false, state = STATE_DEFAULT)
     }
 
     fun release() {
@@ -84,31 +94,31 @@ class TrackViewModel(
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
             playerStateLiveData.value =
-                PlayerState(
+                getCurrentPlayerState().copy(
                     progress = 0f,
                     isPlaying = false,
-                    state = STATE_PREPARED,
-                    inFavorite = inFavorite
+                    state = STATE_PREPARED
                 )
         }
         mediaPlayer.setOnCompletionListener {
             playerJob?.cancel()
             playerStateLiveData.value =
-                PlayerState(
+                getCurrentPlayerState().copy(
                     progress = 0f,
                     isPlaying = false,
-                    state = STATE_PREPARED,
-                    inFavorite = inFavorite
+                    state = STATE_PREPARED
                 )
         }
-
     }
 
     private fun getCurrentPlayerState(): PlayerState {
         return playerStateLiveData.value ?: PlayerState(
             progress = 0f,
             isPlaying = false,
-            state = STATE_PREPARED, inFavorite = inFavorite
+            state = STATE_PREPARED, isFavorite = false,
+            playlists = mutableListOf(),
+            isAdded = false,
+            message = ""
         )
     }
 
@@ -126,7 +136,7 @@ class TrackViewModel(
 
     fun editFavorite(track: Track) {
         viewModelScope.launch {
-            if (inFavorite) {
+            if (playerStateLiveData.value?.isFavorite == true) {
                 deleteFavoriteSuspend(track)
             } else {
                 addFavoriteSuspend(track)
@@ -144,10 +154,53 @@ class TrackViewModel(
     }
 
     private suspend fun checkFavorite(track: Track) {
-        inFavorite = track.trackId?.let {
+        val isFavorite = track.trackId?.let {
             favoritesInteractor.checkFavorite(it)
         } == true
         playerStateLiveData.value =
-            getCurrentPlayerState().copy(inFavorite = inFavorite)
+            getCurrentPlayerState().copy(isFavorite = isFavorite)
+    }
+
+    fun addToPlaylist(playlist: Playlist) {
+        viewModelScope.launch {
+            checkTrackInPlaylist(playlist)
+        }
+    }
+
+    private suspend fun checkTrackInPlaylist(playlist: Playlist) {
+        playlistInteractor.checkTrackInPlaylist(track.trackId.toString(), playlist.id)
+            .collect { result ->
+                if (result.isNotEmpty()) {
+                    playerStateLiveData.value =
+                        getCurrentPlayerState().copy(
+                            message = getApplication<Application>().getString(
+                                R.string.messageAlreadyAdded,
+                                playlist.name
+                            )
+                        )
+                } else {
+                    playerStateLiveData.value =
+                        getCurrentPlayerState().copy(
+                            isAdded = true,
+                            message = getApplication<Application>().getString(
+                                R.string.messageAdded,
+                                playlist.name
+                            )
+                        )
+                    addTrackToPlaylist(track, playlist.id)
+                }
+                playlistInteractor.getPlaylists().collect { result ->
+                    processResult(result)
+                }
+            }
+    }
+
+    private suspend fun addTrackToPlaylist(track: Track, playlistId: Int) {
+        playlistInteractor.addTrackToPlaylist(track, playlistId)
+    }
+
+    fun clearAdd() {
+        playerStateLiveData.value =
+            getCurrentPlayerState().copy(isAdded = false, message = "")
     }
 }

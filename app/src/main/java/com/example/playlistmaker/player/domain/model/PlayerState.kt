@@ -1,5 +1,16 @@
 package com.example.playlistmaker.player.domain.model
 
-data class PlayerState(val progress: Float, var isPlaying: Boolean, val state: Int, val inFavorite: Boolean) {
+
+import com.example.playlistmaker.playlists.domain.model.Playlist
+
+data class PlayerState(
+    val progress: Float,
+    var isPlaying: Boolean,
+    val state: Int,
+    val isFavorite: Boolean,
+    val playlists: List<Playlist>,
+    val isAdded: Boolean,
+    val message: String
+) {
 
 }

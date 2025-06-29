@@ -3,11 +3,17 @@ package com.example.playlistmaker.player.ui.activity
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
@@ -15,6 +21,11 @@ import com.example.playlistmaker.databinding.ActivityTrackBinding
 import com.example.playlistmaker.player.domain.model.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.player.ui.view_model.TrackViewModel
+import com.example.playlistmaker.playlists.ui.adapter.PlaylistPlayerAdapter
+import com.example.playlistmaker.playlists.ui.fragment.CreatePlaylistFragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
@@ -25,7 +36,7 @@ class TrackActivity : AppCompatActivity() {
     companion object {
 
         private const val TRACK_VIEW = "TRACK_VIEW"
-
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
         fun createArgs(trackArg: Track): Bundle =
             bundleOf(TRACK_VIEW to trackArg)
     }
@@ -33,6 +44,14 @@ class TrackActivity : AppCompatActivity() {
     private var track = Track()
     private val viewModel: TrackViewModel by lazy { getViewModel { parametersOf(track) } }
     private lateinit var binding: ActivityTrackBinding
+    private var isClickAllowed = true
+    private val adapter = PlaylistPlayerAdapter {
+        if (clickDebounce()) {
+            viewModel.addToPlaylist(it)
+        }
+    }
+    private lateinit var playlists: RecyclerView
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
     @SuppressLint("UseCompatLoadingForDrawables")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +65,45 @@ class TrackActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.overlay.visibility = View.GONE
+                    }
+
+                    else -> {
+                        binding.overlay.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                if (slideOffset > 0) {
+                    binding.overlay.alpha = slideOffset
+                }
+            }
+        })
+
+        binding.addPlaylistButton.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        binding.createNewPlaylist.setOnClickListener {
+            val fragmentManager = supportFragmentManager
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            val newFragment = CreatePlaylistFragment()
+            fragmentTransaction.replace(R.id.activity_track, newFragment)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
+        }
+
         track = intent.getParcelableExtra<Track>(TRACK_VIEW)!!
 
         viewModel.observeState().observe(this) {
@@ -59,6 +117,9 @@ class TrackActivity : AppCompatActivity() {
         binding.releaseDate.text = track.releaseDate
         binding.country.text = track.country
         binding.primaryGenreName.text = track.primaryGenreName
+        playlists = binding.playlists
+        playlists.adapter = adapter
+        playlists.layoutManager = LinearLayoutManager(this)
 
         Glide.with(this)
             .load(track.artworkUrl100?.replaceAfterLast('/', "512x512bb.jpg"))
@@ -99,10 +160,36 @@ class TrackActivity : AppCompatActivity() {
         }
         binding.time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(state.progress)
 
-        if (state.inFavorite) {
+        if (state.isFavorite) {
             binding.addFavoriteButton.setImageDrawable(getDrawable(R.drawable.favorite))
         } else {
             binding.addFavoriteButton.setImageDrawable(getDrawable(R.drawable.add_favorite))
         }
+
+        if (state.playlists.isNotEmpty()) {
+            adapter.playlists.clear()
+            adapter.playlists.addAll(state.playlists)
+            adapter.notifyDataSetChanged()
+        }
+
+        if (state.message.isNotEmpty()) {
+            if (state.isAdded) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+            Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
+            viewModel.clearAdd()
+        }
+    }
+
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
+        }
+        return current
     }
 }

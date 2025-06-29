@@ -34,4 +34,18 @@
     <string name="empty_favorite">Ваша медиатека пуста</string>
     <string name="empty_playlists">Вы не создали\n ни одного плейлиста</string>
     <string name="new_playlist">Новый плейлист</string>
+    <string name="playlist_cover">Обложка плейлиста</string>
+    <string name="playlist_name">Название*</string>
+    <string name="playlist_note">Описание</string>
+    <string name="playlist_text_button_create">Создать</string>
+    <string name="covers">covers</string>
+    <string name="coverPlaylist">Обложка плейлиста</string>
+    <string name="addToPlaylist">Добавить в плейлист</string>
+    <string name="messageAlreadyAdded">Трек уже добавлен в плейлист %1$s</string>
+    <string name="messageAdded">Добавлено в плейлист %1$s</string>
+    <string name="playlistCreated">Плейлист %1$s создан</string>
+    <string name="dialogTitle">Завершить создание плейлиста?</string>
+    <string name="dialogMessage">Все несохраненные данные будут потеряны</string>
+    <string name="dialogCancel">Отмена</string>
+    <string name="dialogClose">Завершить</string>
 </resources>

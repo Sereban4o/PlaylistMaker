@@ -17,7 +17,7 @@ data class TrackFavoriteEntity(
     val primaryGenreName: String,
     val country: String,
     val previewUrl: String
-){
+) {
     constructor(
         trackId: String,
         trackName: String,
@@ -29,5 +29,17 @@ data class TrackFavoriteEntity(
         primaryGenreName: String,
         country: String,
         previewUrl: String
-    ): this(null, trackId, trackName, artistName, trackTimeMillis, artworkUrl100, collectionName, releaseDate, primaryGenreName, country, previewUrl)
+    ) : this(
+        null,
+        trackId,
+        trackName,
+        artistName,
+        trackTimeMillis,
+        artworkUrl100,
+        collectionName,
+        releaseDate,
+        primaryGenreName,
+        country,
+        previewUrl
+    )
 }

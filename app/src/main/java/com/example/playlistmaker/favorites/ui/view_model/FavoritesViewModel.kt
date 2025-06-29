@@ -1,9 +1,9 @@
 package com.example.playlistmaker.favorites.ui.view_model
 
-import android.content.Context
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.R
 import com.example.playlistmaker.favorites.domain.interactor.FavoritesInteractor
@@ -12,9 +12,9 @@ import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.launch
 
 class FavoritesViewModel(
-    private val context: Context,
+    application: Application,
     private val favoritesInteractor: FavoritesInteractor
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val stateLiveData = MutableLiveData<FavoritesState>()
 
@@ -31,7 +31,7 @@ class FavoritesViewModel(
 
     private fun processResult(tracks: List<Track>) {
         if (tracks.isEmpty()) {
-            renderState(FavoritesState.Empty(context.getString(R.string.empty_favorite)))
+            renderState(FavoritesState.Empty(getApplication<Application>().getString(R.string.empty_favorite)))
         } else {
             renderState(FavoritesState.Content(tracks))
         }
