@@ -1,6 +1,7 @@
 package com.example.playlistmaker.di
 
 import android.content.Context
+import android.media.MediaPlayer
 import androidx.room.Room
 import com.example.playlistmaker.PLAYLIST_PREF
 import com.example.playlistmaker.database.data.db.AppDatabase
@@ -35,6 +36,8 @@ val dataModule = module {
     }
 
     factory { Gson() }
+
+    factory { MediaPlayer() }
 
     single<NetworkClient> { RetrofitNetworkClient(androidApplication(), get()) }
 

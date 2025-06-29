@@ -20,7 +20,8 @@ class TrackViewModel(
     private val track: Track,
     application: Application,
     private val favoritesInteractor: FavoritesInteractor,
-    private val playlistInteractor: PlaylistInteractor
+    private val playlistInteractor: PlaylistInteractor,
+    private val mediaPlayer: MediaPlayer
 ) : AndroidViewModel(application) {
 
     companion object {
@@ -31,7 +32,6 @@ class TrackViewModel(
         private const val DELAY = 300L
     }
 
-    private var mediaPlayer = MediaPlayer()
     private val playerStateLiveData = MutableLiveData<PlayerState>()
     private var playerJob: Job? = null
 
@@ -179,8 +179,6 @@ class TrackViewModel(
                             )
                         )
                 } else {
-                    addTrackToPlaylist(track, playlist.id)
-
                     playerStateLiveData.value =
                         getCurrentPlayerState().copy(
                             isAdded = true,
@@ -189,7 +187,7 @@ class TrackViewModel(
                                 playlist.name
                             )
                         )
-
+                    addTrackToPlaylist(track, playlist.id)
                 }
                 playlistInteractor.getPlaylists().collect { result ->
                     processResult(result)

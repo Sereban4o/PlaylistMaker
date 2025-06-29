@@ -88,6 +88,18 @@
 
     <style name="NavStyle" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/background</item>
+    </style>
 
+    <style name="Dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/Positive</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Neutral</item>
+    </style>
+
+    <style name="Positive" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="backgroundTint">#3772E7</item>
+    </style>
+
+    <style name="Neutral" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="backgroundTint">#3772E7</item>
     </style>
 </resources>

@@ -37,7 +37,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
 
-
 class CreatePlaylistFragment() : Fragment() {
 
     private val viewModel: CreatePlaylistViewModel by viewModel()
@@ -48,8 +47,7 @@ class CreatePlaylistFragment() : Fragment() {
     private lateinit var nameEditText: EditText
     private lateinit var noteEditText: EditText
     private lateinit var buttonTextView: TextView
-    private var addImage = false
-    private var imageUri: Uri? = null
+    private lateinit var imageUri: Uri
     private var playlist = Playlist()
     private lateinit var file: File
     private lateinit var confirmDialog: MaterialAlertDialogBuilder
@@ -63,7 +61,6 @@ class CreatePlaylistFragment() : Fragment() {
         _binding = FragmentCreatePlaylistBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,8 +78,9 @@ class CreatePlaylistFragment() : Fragment() {
         noteEditText = binding.playlistNote
         buttonTextView = binding.buttonCreate
         buttonTextView.isEnabled = false
+        imageUri = Uri.EMPTY
 
-        confirmDialog = MaterialAlertDialogBuilder(requireContext())
+        confirmDialog = MaterialAlertDialogBuilder(requireContext(), R.style.Dialog)
             .setTitle(getString(R.string.dialogTitle))
             .setMessage(getString(R.string.dialogMessage))
             .setNeutralButton(getString(R.string.dialogCancel)) { dialog, which ->
@@ -101,9 +99,6 @@ class CreatePlaylistFragment() : Fragment() {
                     binding.playlistCover.setPadding(0)
                     binding.playlistCover.background = null
                     binding.playlistCover.setScaleType(ImageView.ScaleType.CENTER_CROP)
-                    addImage = true
-                    buttonTextView.isEnabled =
-                        (nameEditText.text.toString().isNotEmpty() && addImage)
 
                 }
             }
@@ -137,12 +132,21 @@ class CreatePlaylistFragment() : Fragment() {
         }
 
         binding.buttonCreate.setOnClickListener {
-            saveImageToPrivateStorage(imageUri!!)
-            playlist = Playlist(
-                name = nameEditText.text.toString(),
-                note = noteEditText.text.toString(),
-                imageUri = file.absolutePath
-            )
+            if (imageUri != Uri.EMPTY) {
+                saveImageToPrivateStorage(imageUri)
+
+                playlist = Playlist(
+                    name = nameEditText.text.toString(),
+                    note = noteEditText.text.toString(),
+                    imageUri = file.absolutePath
+                )
+            } else {
+                playlist = Playlist(
+                    name = nameEditText.text.toString(),
+                    note = noteEditText.text.toString(),
+                    imageUri = ""
+                )
+            }
             viewModel.addPlaylist(playlist)
             isSave = true
             val text =
@@ -172,7 +176,7 @@ class CreatePlaylistFragment() : Fragment() {
                     noteEditText.setBackgroundResource(R.drawable.edit_text_playlist)
                 }
 
-                buttonTextView.isEnabled = (nameEditText.text.toString().isNotEmpty() && addImage)
+                buttonTextView.isEnabled = (nameEditText.text.toString().isNotEmpty())
 
             }
 
@@ -215,7 +219,7 @@ class CreatePlaylistFragment() : Fragment() {
 
     private fun close() {
         if (!isSave && (nameEditText.text.toString().isNotEmpty() || noteEditText.text.toString()
-                .isNotEmpty() || addImage)
+                .isNotEmpty() || imageUri != Uri.EMPTY)
         ) {
             confirmDialog.show()
         } else {
