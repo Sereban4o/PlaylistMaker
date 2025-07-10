@@ -110,9 +110,7 @@ open class CreatePlaylistFragment() : Fragment() {
         confirmDialog = MaterialAlertDialogBuilder(requireContext(), R.style.Dialog)
             .setTitle(getString(R.string.dialogTitle))
             .setMessage(getString(R.string.dialogMessage))
-            .setNeutralButton(getString(R.string.dialogCancel)) { dialog, which ->
-
-            }
+            .setNegativeButton(getString(R.string.dialogCancel)) { dialog, which ->}
             .setPositiveButton(getString(R.string.dialogClose)) { dialog, which ->
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             }

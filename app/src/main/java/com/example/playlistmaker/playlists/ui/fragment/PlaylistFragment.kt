@@ -138,6 +138,7 @@ class PlaylistFragment : Fragment() {
                     .setNeutralButton(getString(R.string.no)) { dialog, which ->
 
                     }
+
                     .setPositiveButton(getString(R.string.yes)) { dialog, which ->
                         viewModel.deleteTrackFromPlaylist(track.trackId.toString(), playlist.id)
                     }.show()
@@ -167,9 +168,7 @@ class PlaylistFragment : Fragment() {
         binding.menuDelete.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext(), R.style.Dialog)
                 .setMessage(getString(R.string.textDeletePlaylist, playlist.name))
-                .setNeutralButton(getString(R.string.no)) { dialog, which ->
-
-                }
+                .setNegativeButton(getString(R.string.no)) { dialog, which -> }
                 .setPositiveButton(getString(R.string.yes)) { dialog, which ->
                     viewModel.deletePlaylist(playlist.id)
                     if (playlist.imageUri.isNotEmpty()) {
@@ -195,6 +194,7 @@ class PlaylistFragment : Fragment() {
     }
 
     private fun render(state: PlaylistState) {
+        playlist = state.playlist
         binding.name.text = state.playlist.name
         binding.playlistName.text = state.playlist.name
         binding.countTracks.text =

@@ -43,6 +43,7 @@ class PlaylistViewModel(
         viewModelScope.launch {
 
             playlistsInteractor.getTracks(playlist.id).collect { tracks ->
+                allTime = 0L
                 val formatter = SimpleDateFormat("mm:ss")
                 for (track in tracks) {
                     allTime += formatter.parse(track.trackTimeMillis).time

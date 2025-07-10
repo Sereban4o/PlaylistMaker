@@ -36,13 +36,7 @@ class PlaylistsViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
             .load(playlist.imageUri)
             .placeholder(R.drawable.no_cover)
             .centerCrop()
-            .transform(
-                RoundedCorners(
-                    TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP, 2F, metrics.displayMetrics
-                    ).toInt()
-                )
-            )
+
             .into(playlistImage)
 
     }
