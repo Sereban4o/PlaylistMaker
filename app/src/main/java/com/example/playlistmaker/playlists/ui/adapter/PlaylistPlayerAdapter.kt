@@ -30,3 +30,4 @@ class PlaylistPlayerAdapter(private val onClickListener: OnClickListener) :
         fun onClick(playlist: Playlist)
     }
 }
+

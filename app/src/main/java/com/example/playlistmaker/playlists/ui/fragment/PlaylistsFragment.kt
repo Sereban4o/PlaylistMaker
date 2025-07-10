@@ -38,8 +38,13 @@ class PlaylistsFragment : Fragment() {
     private lateinit var placeholderMessage: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var playlistsRecycler: RecyclerView
-    private val adapter = PlaylistsAdapter()
+    private val adapter = PlaylistsAdapter {
+        findNavController().navigate(
+            R.id.action_libraryFragment_to_playlistFragment,
+            PlaylistFragment.createArgs(it)
 
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

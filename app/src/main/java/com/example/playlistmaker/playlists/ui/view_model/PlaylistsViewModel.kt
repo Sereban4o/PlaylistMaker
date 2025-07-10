@@ -7,14 +7,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.R
 import com.example.playlistmaker.playlists.domain.model.Playlist
-import com.example.playlistmaker.playlists.domain.interactor.PlaylistInteractor
+import com.example.playlistmaker.playlists.domain.interactor.PlaylistsInteractor
 import com.example.playlistmaker.playlists.domain.state.PlaylistsState
 import kotlinx.coroutines.launch
 
 
 class PlaylistsViewModel(
     application: Application,
-    private val playlistInteractor: PlaylistInteractor
+    private val playlistsInteractor: PlaylistsInteractor
 ) : AndroidViewModel(application) {
 
     private val stateLiveData = MutableLiveData<PlaylistsState>()
@@ -23,7 +23,7 @@ class PlaylistsViewModel(
     fun fillData() {
         renderState(PlaylistsState.Loading)
         viewModelScope.launch {
-            playlistInteractor.getPlaylists().collect { playlists ->
+            playlistsInteractor.getPlaylists().collect { playlists ->
                 processResult(playlists)
             }
         }

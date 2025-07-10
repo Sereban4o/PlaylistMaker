@@ -40,4 +40,5 @@
     <color name="playlistButtonCreateActive">#3772E7</color>
     <color name="rectangle">#FFFFFF</color>
     <color name="tracksPlaylistText">#FFFFFF</color>
+    <color name="menuTextPlaylist">#FFFFFF</color>
 </resources>

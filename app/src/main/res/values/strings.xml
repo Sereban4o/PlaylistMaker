@@ -48,4 +48,18 @@
     <string name="dialogMessage">Все несохраненные данные будут потеряны</string>
     <string name="dialogCancel">Отмена</string>
     <string name="dialogClose">Завершить</string>
+    <string name="time">%1$s минут</string>
+    <string name="countTracks">%1$s треков</string>
+    <string name="deleteTrack">Хотите удалить трек?</string>
+    <string name="textDeletePlaylist">Хотите удалить плейлист %1$s?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="noTracksInPlaylist">В этом плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="sharingTrack">%1$s. %2$s - %3$s (%4$s)</string>
+    <string name="sharePlaylist">Поделиться</string>
+    <string name="editPlaylist">Редактировать информацию</string>
+    <string name="editPlaylistTitle">Редактировать</string>
+    <string name="deletePlaylist">Удалить плейлист</string>
+    <string name="save">Сохранить</string>
+    <string name="playlistUpdated">Плейлист %1$s обновлен</string>
 </resources>

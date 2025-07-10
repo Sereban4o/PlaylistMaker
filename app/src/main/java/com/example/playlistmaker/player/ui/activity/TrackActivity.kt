@@ -77,7 +77,6 @@ class TrackActivity : AppCompatActivity() {
                     BottomSheetBehavior.STATE_HIDDEN -> {
                         binding.overlay.visibility = View.GONE
                     }
-
                     else -> {
                         binding.overlay.visibility = View.VISIBLE
                     }
@@ -109,7 +108,19 @@ class TrackActivity : AppCompatActivity() {
         viewModel.observeState().observe(this) {
             render(it)
         }
+        viewModel.observeMessage().observe(this) {
+            if (it.isNotEmpty()) {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        }
 
+        viewModel.observeIsAdded().observe(this) {
+            if (!it) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+        }
+
+        viewModel.getPlaylists()
         binding.trackName.text = track.trackName
         binding.artistName.text = track.artistName
         binding.trackTimeMills.text = track.trackTimeMillis
@@ -134,13 +145,11 @@ class TrackActivity : AppCompatActivity() {
             )
             .into(binding.trackImage)
 
-
         binding.arrowBack.setOnClickListener {
             viewModel.release()
             finish()
         }
         viewModel.preparePlayer()
-
 
         binding.playButton.setOnClickListener {
             viewModel.playbackControl()
@@ -170,14 +179,6 @@ class TrackActivity : AppCompatActivity() {
             adapter.playlists.clear()
             adapter.playlists.addAll(state.playlists)
             adapter.notifyDataSetChanged()
-        }
-
-        if (state.message.isNotEmpty()) {
-            if (state.isAdded) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
-            Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
-            viewModel.clearAdd()
         }
     }
 
