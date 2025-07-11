@@ -91,15 +91,10 @@
     </style>
 
     <style name="Dialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="buttonBarPositiveButtonStyle">@style/Positive</item>
-        <item name="buttonBarNeutralButtonStyle">@style/Neutral</item>
+        <item name="android:background">@color/bdDialog</item>
+        <item name="colorPrimary">@color/buttonDialog</item>
+        <item name="colorOnSurface">@color/titleDialog</item>
     </style>
 
-    <style name="Positive" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="backgroundTint">#3772E7</item>
-    </style>
 
-    <style name="Neutral" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="backgroundTint">#3772E7</item>
-    </style>
 </resources>

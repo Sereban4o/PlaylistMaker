@@ -23,4 +23,14 @@ class PlaylistDbConvertor {
             playlist.countTracks
         )
     }
+
+    fun map(playlist: PlaylistEntity): Playlist {
+        return Playlist(
+            playlist.id,
+            playlist.name,
+            playlist.note,
+            playlist.imageUri
+
+        )
+    }
 }

@@ -20,12 +20,12 @@ import androidx.activity.addCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.playlistmaker.R
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.example.playlistmaker.databinding.FragmentCreatePlaylistBinding
 import com.example.playlistmaker.playlists.domain.model.Playlist
 import com.example.playlistmaker.playlists.ui.view_model.CreatePlaylistViewModel
@@ -33,13 +33,25 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.markodevcic.peko.PermissionRequester
 import com.markodevcic.peko.PermissionResult
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.core.parameter.parametersOf
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
+import kotlin.lazy
+import androidx.core.net.toUri
 
-class CreatePlaylistFragment() : Fragment() {
+open class CreatePlaylistFragment() : Fragment() {
 
-    private val viewModel: CreatePlaylistViewModel by viewModel()
+    companion object {
+
+        private const val PLAYLIST_VIEW = "PLAYLIST_VIEW"
+        fun createArgs(playlistArg: Playlist?): Bundle =
+            bundleOf(PLAYLIST_VIEW to playlistArg)
+    }
+
+    private var playlistArg = null as Playlist?
+    private val viewModel: CreatePlaylistViewModel by lazy { getViewModel { parametersOf(playlistArg) } }
     private var _binding: FragmentCreatePlaylistBinding? = null
     private val binding get() = _binding!!
     private val requester = PermissionRequester.instance()
@@ -49,9 +61,11 @@ class CreatePlaylistFragment() : Fragment() {
     private lateinit var buttonTextView: TextView
     private lateinit var imageUri: Uri
     private var playlist = Playlist()
+    private var updatePlaylist = Playlist()
     private lateinit var file: File
     private lateinit var confirmDialog: MaterialAlertDialogBuilder
     private var isSave = false
+    private var text: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,6 +79,17 @@ class CreatePlaylistFragment() : Fragment() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (arguments != null) {
+            playlistArg = arguments?.getParcelable(PLAYLIST_VIEW)!!
+            binding.playlistName.setText(playlistArg?.name)
+            binding.playlistNote.setText(playlistArg?.note)
+            if (playlistArg?.imageUri != "") {
+                binding.playlistCover.setImageURI(playlistArg?.imageUri?.toUri())
+            }
+            binding.title.text = getString(R.string.editPlaylistTitle)
+            binding.buttonCreate.text = getString(R.string.save)
+            binding.buttonCreate.isEnabled = true
+        }
 
         requireActivity()
             .onBackPressedDispatcher
@@ -77,15 +102,15 @@ class CreatePlaylistFragment() : Fragment() {
         nameEditText = binding.playlistName
         noteEditText = binding.playlistNote
         buttonTextView = binding.buttonCreate
-        buttonTextView.isEnabled = false
+        if (playlistArg == null) {
+            buttonTextView.isEnabled = false
+        }
         imageUri = Uri.EMPTY
 
         confirmDialog = MaterialAlertDialogBuilder(requireContext(), R.style.Dialog)
             .setTitle(getString(R.string.dialogTitle))
             .setMessage(getString(R.string.dialogMessage))
-            .setNeutralButton(getString(R.string.dialogCancel)) { dialog, which ->
-
-            }
+            .setNegativeButton(getString(R.string.dialogCancel)) { dialog, which ->}
             .setPositiveButton(getString(R.string.dialogClose)) { dialog, which ->
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             }
@@ -132,29 +157,64 @@ class CreatePlaylistFragment() : Fragment() {
         }
 
         binding.buttonCreate.setOnClickListener {
-            if (imageUri != Uri.EMPTY) {
-                saveImageToPrivateStorage(imageUri)
 
-                playlist = Playlist(
-                    name = nameEditText.text.toString(),
-                    note = noteEditText.text.toString(),
-                    imageUri = file.absolutePath
-                )
+            var oldUri = ""
+
+            if (playlistArg == null) {
+                if (imageUri != Uri.EMPTY) {
+                    saveImageToPrivateStorage(imageUri)
+
+                    playlist = Playlist(
+                        name = nameEditText.text.toString(),
+                        note = noteEditText.text.toString(),
+                        imageUri = file.absolutePath
+                    )
+                } else {
+                    playlist = Playlist(
+                        name = nameEditText.text.toString(),
+                        note = noteEditText.text.toString(),
+                        imageUri = ""
+                    )
+                }
+                viewModel.addPlaylist(playlist)
+                text =
+                    activity?.resources?.getString(R.string.playlistCreated, playlist.name);
+
+
             } else {
-                playlist = Playlist(
-                    name = nameEditText.text.toString(),
-                    note = noteEditText.text.toString(),
-                    imageUri = ""
-                )
-            }
-            viewModel.addPlaylist(playlist)
-            isSave = true
-            val text =
-                activity?.resources?.getString(R.string.playlistCreated, playlist.name);
 
+                if (imageUri != Uri.EMPTY) {
+                    saveImageToPrivateStorage(imageUri)
+                    oldUri = playlistArg!!.imageUri
+                    updatePlaylist = Playlist(
+                        id = playlistArg!!.id,
+                        name = nameEditText.text.toString(),
+                        note = noteEditText.text.toString(),
+                        imageUri = file.absolutePath
+                    )
+
+
+                } else {
+                    updatePlaylist = Playlist(
+                        id = playlistArg!!.id,
+                        name = nameEditText.text.toString(),
+                        note = noteEditText.text.toString(),
+                        imageUri = playlistArg!!.imageUri
+                    )
+                }
+
+
+                viewModel.updatePlaylist(updatePlaylist)
+                if (oldUri.isNotEmpty()) {
+                    deleteImageFromPrivateStorage(oldUri)
+                }
+                text =
+                    activity?.resources?.getString(R.string.playlistUpdated, playlist.name)
+            }
+
+            isSave = true
             Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
             requireActivity().onBackPressedDispatcher.onBackPressed()
-
         }
 
         textWatcher = object : TextWatcher {
@@ -185,7 +245,6 @@ class CreatePlaylistFragment() : Fragment() {
         }
         textWatcher.let { nameEditText.addTextChangedListener(it) }
         textWatcher.let { noteEditText.addTextChangedListener(it) }
-
     }
 
     private fun saveImageToPrivateStorage(uri: Uri) {
@@ -209,7 +268,6 @@ class CreatePlaylistFragment() : Fragment() {
         BitmapFactory
             .decodeStream(inputStream)
             .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
-
     }
 
     override fun onDestroyView() {
@@ -218,14 +276,18 @@ class CreatePlaylistFragment() : Fragment() {
     }
 
     private fun close() {
-        if (!isSave && (nameEditText.text.toString().isNotEmpty() || noteEditText.text.toString()
+        if (!isSave && playlistArg == null && (nameEditText.text.toString()
+                .isNotEmpty() || noteEditText.text.toString()
                 .isNotEmpty() || imageUri != Uri.EMPTY)
         ) {
             confirmDialog.show()
         } else {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-
     }
 
+    private fun deleteImageFromPrivateStorage(uri: String) {
+        val file = File(uri)
+        file.delete()
+    }
 }
