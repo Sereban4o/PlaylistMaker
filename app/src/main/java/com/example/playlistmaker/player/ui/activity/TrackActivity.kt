@@ -155,13 +155,10 @@ class TrackActivity : AppCompatActivity() {
 
 
         binding.playButton.setOnTouchListener { v, event ->
-            v.onTouchEvent(event)
-            if (event.action == MotionEvent.ACTION_UP) {
+            if (v.onTouchEvent(event)) {
                 viewModel.playbackControl()
-                return@setOnTouchListener true
-            } else {
-                return@setOnTouchListener false
             }
+            return@setOnTouchListener true
         }
 
         binding.addFavoriteButton.setOnClickListener {
@@ -173,7 +170,7 @@ class TrackActivity : AppCompatActivity() {
     private fun render(state: PlayerState) {
 
         if (state.state == 1) {
-            binding.playButton.endPlay()
+            binding.playButton.toggleIsPlaying()
         }
 
         binding.time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(state.progress)

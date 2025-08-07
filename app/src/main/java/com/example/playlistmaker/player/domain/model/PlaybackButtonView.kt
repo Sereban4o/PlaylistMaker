@@ -52,13 +52,11 @@ class PlaybackButtonView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         if (!isPlay) {
             imagePlayBitmap?.let {
-                val rect = RectF(0f, 0f, measuredWidth.toFloat(), measuredHeight.toFloat())
-                canvas.drawBitmap(imagePlayBitmap, null, rect, null)
+                canvas.drawBitmap(imagePlayBitmap, null, imageRect, null)
             }
         } else {
             imagePauseBitmap?.let {
-                val rect = RectF(0f, 0f, measuredWidth.toFloat(), measuredHeight.toFloat())
-                canvas.drawBitmap(imagePauseBitmap, null, rect, null)
+                canvas.drawBitmap(imagePauseBitmap, null, imageRect, null)
             }
         }
     }
@@ -67,20 +65,19 @@ class PlaybackButtonView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                return true
+                return false
             }
 
             MotionEvent.ACTION_UP -> {
-                isPlay = !isPlay
-                invalidate()
+                toggleIsPlaying()
                 return true
             }
         }
         return super.onTouchEvent(event)
     }
 
-    fun endPlay() {
-        isPlay = false
+    fun toggleIsPlaying() {
+        isPlay = !isPlay
         invalidate()
     }
 
