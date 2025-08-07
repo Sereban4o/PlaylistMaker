@@ -3,6 +3,7 @@ package com.example.playlistmaker.player.ui.activity
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -53,7 +54,7 @@ class TrackActivity : AppCompatActivity() {
     private lateinit var playlists: RecyclerView
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint("UseCompatLoadingForDrawables", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTrackBinding.inflate(layoutInflater)
@@ -77,6 +78,7 @@ class TrackActivity : AppCompatActivity() {
                     BottomSheetBehavior.STATE_HIDDEN -> {
                         binding.overlay.visibility = View.GONE
                     }
+
                     else -> {
                         binding.overlay.visibility = View.VISIBLE
                     }
@@ -151,8 +153,15 @@ class TrackActivity : AppCompatActivity() {
         }
         viewModel.preparePlayer()
 
-        binding.playButton.setOnClickListener {
-            viewModel.playbackControl()
+
+        binding.playButton.setOnTouchListener { v, event ->
+            v.onTouchEvent(event)
+            if (event.action == MotionEvent.ACTION_UP) {
+                viewModel.playbackControl()
+                return@setOnTouchListener true
+            } else {
+                return@setOnTouchListener false
+            }
         }
 
         binding.addFavoriteButton.setOnClickListener {
@@ -160,13 +169,13 @@ class TrackActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint("UseCompatLoadingForDrawables", "NotifyDataSetChanged")
     private fun render(state: PlayerState) {
-        if (state.isPlaying) {
-            binding.playButton.setImageDrawable(getDrawable(R.drawable.pause))
-        } else {
-            binding.playButton.setImageDrawable(getDrawable(R.drawable.play))
+
+        if (state.state == 1) {
+            binding.playButton.endPlay()
         }
+
         binding.time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(state.progress)
 
         if (state.isFavorite) {

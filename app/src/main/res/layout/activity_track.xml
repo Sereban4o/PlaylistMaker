@@ -94,22 +94,23 @@
                 android:layout_height="51dp"
                 android:layout_marginTop="54dp"
                 android:background="@null"
-                app:layout_constraintEnd_toStartOf="@+id/playButton"
                 app:layout_constraintHorizontal_chainStyle="spread"
                 app:layout_constraintStart_toStartOf="@+id/left_guideline"
                 app:layout_constraintTop_toBottomOf="@id/artistName"
                 app:srcCompat="@drawable/add_playlist" />
 
-            <ImageButton
+            <com.example.playlistmaker.player.domain.model.PlaybackButtonView
                 android:id="@+id/playButton"
-                android:layout_width="0dp"
-                android:layout_height="84dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:background="@null"
+                app:imagePause="@drawable/pause"
+                app:imagePlay="@drawable/play"
                 app:layout_constraintBottom_toBottomOf="@+id/addPlaylistButton"
                 app:layout_constraintEnd_toStartOf="@+id/addFavoriteButton"
                 app:layout_constraintStart_toEndOf="@+id/addPlaylistButton"
-                app:layout_constraintTop_toTopOf="@+id/addPlaylistButton"
-                app:srcCompat="@drawable/play" />
+                app:layout_constraintTop_toTopOf="@+id/addPlaylistButton" />
+
 
             <ImageButton
                 android:id="@+id/addFavoriteButton"
@@ -118,7 +119,6 @@
                 android:layout_marginTop="54dp"
                 android:background="@null"
                 app:layout_constraintEnd_toEndOf="@id/right_guideline"
-                app:layout_constraintStart_toEndOf="@+id/playButton"
                 app:layout_constraintTop_toBottomOf="@id/artistName"
                 app:srcCompat="@drawable/add_favorite" />
 
