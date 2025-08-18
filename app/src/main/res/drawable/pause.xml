@@ -1,9 +1,9 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="84dp"
-    android:height="84dp"
-    android:viewportWidth="84"
-    android:viewportHeight="84">
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
   <path
-      android:pathData="M42,0.333C19,0.333 0.333,19 0.333,42C0.333,65 19,83.667 42,83.667C65,83.667 83.667,65 83.667,42C83.667,19 65,0.333 42,0.333ZM37.833,58.667H29.5V25.333H37.833V58.667ZM54.5,58.667H46.167V25.333H54.5V58.667Z"
+      android:pathData="M50 8.33325C27 8.33325 8.33337 26.9999 8.33337 49.9999C8.33337 72.9999 27 91.6666 50 91.6666C73 91.6666 91.6667 72.9999 91.6667 49.9999C91.6667 26.9999 73 8.33325 50 8.33325ZM45.8334 66.6666H37.5V33.3333H45.8334V66.6666ZM62.5 66.6666H54.1667V33.3333H62.5V66.6666Z"
       android:fillColor="@color/trackButton"/>
 </vector>
