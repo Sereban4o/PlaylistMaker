@@ -1,13 +1,20 @@
 package com.example.playlistmaker.player.ui.activity
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.TypedValue
-import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
@@ -19,23 +26,22 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityTrackBinding
+import com.example.playlistmaker.player.services.AudioState
 import com.example.playlistmaker.player.domain.model.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.player.ui.view_model.TrackViewModel
 import com.example.playlistmaker.playlists.ui.adapter.PlaylistPlayerAdapter
 import com.example.playlistmaker.playlists.ui.fragment.CreatePlaylistFragment
+import com.example.playlistmaker.player.services.AudioService
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.core.parameter.parametersOf
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class TrackActivity : AppCompatActivity() {
 
     companion object {
-
         private const val TRACK_VIEW = "TRACK_VIEW"
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         fun createArgs(trackArg: Track): Bundle =
@@ -48,11 +54,34 @@ class TrackActivity : AppCompatActivity() {
     private var isClickAllowed = true
     private val adapter = PlaylistPlayerAdapter {
         if (clickDebounce()) {
-            viewModel.addToPlaylist(it)
+            viewModel.addToPlaylist(it, track)
         }
     }
     private lateinit var playlists: RecyclerView
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            bindAudioService()
+        } else {
+            Toast.makeText(this, "Can't bind service!", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private val serviceConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as AudioService.AudioServiceBinder
+            viewModel.setAudioPlayerControl(binder.getService())
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            viewModel.removeAudioPlayerControl()
+        }
+    }
 
     @SuppressLint("UseCompatLoadingForDrawables", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +89,16 @@ class TrackActivity : AppCompatActivity() {
         binding = ActivityTrackBinding.inflate(layoutInflater)
         setContentView(binding.root)
         enableEdgeToEdge()
+
+        viewModel.observeAudioState().observe(this) {
+            updateButtonAndProgress(it)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            bindAudioService()
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.activityTrack) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -148,15 +187,12 @@ class TrackActivity : AppCompatActivity() {
             .into(binding.trackImage)
 
         binding.arrowBack.setOnClickListener {
-            viewModel.release()
             finish()
         }
-        viewModel.preparePlayer()
-
 
         binding.playButton.setOnTouchListener { v, event ->
             if (v.onTouchEvent(event)) {
-                viewModel.playbackControl()
+                viewModel.onPlayerButtonClicked()
             }
             return@setOnTouchListener true
         }
@@ -168,12 +204,6 @@ class TrackActivity : AppCompatActivity() {
 
     @SuppressLint("UseCompatLoadingForDrawables", "NotifyDataSetChanged")
     private fun render(state: PlayerState) {
-
-        if (state.state == 1) {
-            binding.playButton.toggleIsPlaying()
-        }
-
-        binding.time.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(state.progress)
 
         if (state.isFavorite) {
             binding.addFavoriteButton.setImageDrawable(getDrawable(R.drawable.favorite))
@@ -198,5 +228,32 @@ class TrackActivity : AppCompatActivity() {
             }
         }
         return current
+    }
+
+    override fun onDestroy() {
+        unbindAudioService()
+        super.onDestroy()
+    }
+
+    private fun bindAudioService() {
+        val intent = Intent(this, AudioService::class.java).apply {
+            putExtra("trackUrl", track.previewUrl)
+            putExtra("artistName", track.artistName)
+            putExtra("trackName", track.trackName)
+        }
+
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    private fun unbindAudioService() {
+        unbindService(serviceConnection)
+    }
+
+
+    private fun updateButtonAndProgress(audioState: AudioState) {
+        binding.playButton.apply {
+            isPlay = audioState.isPlaying
+        }
+        binding.time.text = audioState.progress
     }
 }
