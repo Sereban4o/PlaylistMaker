@@ -48,6 +48,14 @@ class TrackViewModel(
         }
     }
 
+    fun showNotification() {
+        audioPlayerControl?.showNotification()
+    }
+
+    fun hideNotification() {
+        audioPlayerControl?.hideNotification()
+    }
+
     fun onPlayerButtonClicked() {
         if (audioState.value is AudioState.Playing) {
             audioPlayerControl?.pausePlayer()

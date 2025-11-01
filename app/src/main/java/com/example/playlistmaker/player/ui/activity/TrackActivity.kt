@@ -9,6 +9,7 @@ import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.LinearLayout
@@ -79,8 +80,18 @@ class TrackActivity : AppCompatActivity() {
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
-            viewModel.removeAudioPlayerControl()
+               viewModel.removeAudioPlayerControl()
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.showNotification()
+    }
+
+   override fun onResume() {
+        super.onResume()
+        viewModel.hideNotification()
     }
 
     @SuppressLint("UseCompatLoadingForDrawables", "ClickableViewAccessibility")
@@ -237,9 +248,8 @@ class TrackActivity : AppCompatActivity() {
 
     private fun bindAudioService() {
         val intent = Intent(this, AudioService::class.java).apply {
-            putExtra("trackUrl", track.previewUrl)
-            putExtra("artistName", track.artistName)
-            putExtra("trackName", track.trackName)
+            putExtra("track", track)
+
         }
 
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)

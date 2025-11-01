@@ -13,6 +13,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.example.playlistmaker.R
+import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,16 +27,8 @@ import java.util.Locale
 
 internal class AudioService : Service(), AudioPlayerControl {
 
-    private companion object {
-        const val NOTIFICATION_CHANNEL_ID = "playmaker_service_channel"
-        const val SERVICE_NOTIFICATION_ID = 100
-        private const val DELAY = 300L
-    }
-
     private var mediaPlayer: MediaPlayer? = null
-    private var trackUrl = ""
-    private var artistName = ""
-    private var trackName = ""
+    private var track: Track? = null
     private val binder = AudioServiceBinder()
     private var timerJob: Job? = null
     private val _audioState = MutableStateFlow<AudioState>(AudioState.Default())
@@ -47,17 +40,8 @@ internal class AudioService : Service(), AudioPlayerControl {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        trackUrl = intent?.getStringExtra("trackUrl") ?: ""
-        artistName = intent?.getStringExtra("artistName") ?: ""
-        trackName = intent?.getStringExtra("trackName") ?: ""
+        track = intent?.getParcelableExtra<Track>("track")
         initMediaPlayer()
-        createNotificationChannel()
-        ServiceCompat.startForeground(
-            this,
-            SERVICE_NOTIFICATION_ID,
-            createServiceNotification(),
-            getForegroundServiceTypeConstant()
-        )
         return binder
     }
 
@@ -94,7 +78,7 @@ internal class AudioService : Service(), AudioPlayerControl {
     private fun createServiceNotification(): Notification {
         return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(appName)
-            .setContentText("$artistName - $trackName")
+            .setContentText("${track?.artistName} - ${track?.trackName}")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -106,21 +90,22 @@ internal class AudioService : Service(), AudioPlayerControl {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        trackUrl = intent?.getStringExtra("trackUrl") ?: ""
         initMediaPlayer()
         return START_NOT_STICKY
     }
 
     private fun initMediaPlayer() {
-        if (trackUrl.isEmpty()) return
+        if (track == null) return
 
-        mediaPlayer?.setDataSource(trackUrl)
+        mediaPlayer?.setDataSource(track?.previewUrl)
         mediaPlayer?.prepareAsync()
         mediaPlayer?.setOnPreparedListener {
             _audioState.value = AudioState.Prepared()
         }
         mediaPlayer?.setOnCompletionListener {
             _audioState.value = AudioState.Prepared()
+            hideNotification()
+
         }
     }
 
@@ -140,6 +125,22 @@ internal class AudioService : Service(), AudioPlayerControl {
         _audioState.value = AudioState.Paused(getCurrentPlayerPosition())
     }
 
+    override fun showNotification() {
+        if (_audioState.value is AudioState.Playing) {
+            createNotificationChannel()
+            ServiceCompat.startForeground(
+                this,
+                SERVICE_NOTIFICATION_ID,
+                createServiceNotification(),
+                getForegroundServiceTypeConstant()
+            )
+        }
+    }
+
+    override fun hideNotification() {
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+    }
+
     private fun releasePlayer() {
         mediaPlayer?.stop()
         timerJob?.cancel()
@@ -149,7 +150,6 @@ internal class AudioService : Service(), AudioPlayerControl {
         mediaPlayer?.release()
         mediaPlayer = null
     }
-
 
     private fun startTimer() {
         timerJob = CoroutineScope(Dispatchers.Default).launch {
@@ -165,4 +165,11 @@ internal class AudioService : Service(), AudioPlayerControl {
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer?.currentPosition)
             ?: "00:00"
     }
+
+    private companion object {
+        const val NOTIFICATION_CHANNEL_ID = "playmaker_service_channel"
+        const val SERVICE_NOTIFICATION_ID = 100
+        private const val DELAY = 300L
+    }
+
 }
