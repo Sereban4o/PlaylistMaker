@@ -25,7 +25,7 @@ class PlaybackButtonView @JvmOverloads constructor(
     private val imagePauseBitmap: Bitmap?
     private var imageRect = RectF(0f, 0f, 0f, 0f)
 
-    private var isPlay = false
+    var isPlay = false
 
     init {
         context.theme.obtainStyledAttributes(
@@ -34,9 +34,10 @@ class PlaybackButtonView @JvmOverloads constructor(
             defStyleAttr, defStyleRes
         ).apply {
             try {
-                imagePlayBitmap = getDrawable(R.styleable.PlaybackButtonView_imagePlay)?.toBitmap()
                 imagePauseBitmap =
                     getDrawable(R.styleable.PlaybackButtonView_imagePause)?.toBitmap()
+                imagePlayBitmap = getDrawable(R.styleable.PlaybackButtonView_imagePlay)?.toBitmap()
+
             } finally {
                 recycle()
             }
@@ -50,14 +51,15 @@ class PlaybackButtonView @JvmOverloads constructor(
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
-        if (!isPlay) {
-            imagePlayBitmap?.let {
-                canvas.drawBitmap(imagePlayBitmap, null, imageRect, null)
-            }
-        } else {
+        if (isPlay) {
             imagePauseBitmap?.let {
                 canvas.drawBitmap(imagePauseBitmap, null, imageRect, null)
             }
+        } else {
+            imagePlayBitmap?.let {
+                canvas.drawBitmap(imagePlayBitmap, null, imageRect, null)
+            }
+
         }
     }
 
@@ -69,16 +71,11 @@ class PlaybackButtonView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_UP -> {
-                toggleIsPlaying()
+                invalidate()
                 return true
             }
         }
         return super.onTouchEvent(event)
-    }
-
-    fun toggleIsPlaying() {
-        isPlay = !isPlay
-        invalidate()
     }
 
 
