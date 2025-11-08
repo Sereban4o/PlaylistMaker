@@ -18,6 +18,11 @@ class PlaylistsViewModel(
 ) : AndroidViewModel(application) {
 
     private val stateLiveData = MutableLiveData<PlaylistsState>()
+
+    init {
+        fillData()
+    }
+
     fun observeState(): LiveData<PlaylistsState> = stateLiveData
 
     fun fillData() {

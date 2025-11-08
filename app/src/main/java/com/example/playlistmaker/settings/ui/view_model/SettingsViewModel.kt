@@ -1,6 +1,7 @@
 package com.example.playlistmaker.settings.ui.view_model
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractor
@@ -14,15 +15,16 @@ class SettingsViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
-    private val currentThemeSetting = SingleEventLiveData<Boolean>()
+//    private val currentThemeSetting = SingleEventLiveData<Boolean>()
+//
+//    init {
+//        currentThemeSetting.value = settingsInteractor.getThemeSettings()
+//    }
 
-    init {
-        currentThemeSetting.value = settingsInteractor.getThemeSettings()
-    }
-
-    fun getCurrentTheme(): LiveData<Boolean> = currentThemeSetting
+    fun getCurrentTheme(): Boolean = settingsInteractor.getThemeSettings()
 
     fun updateThemeSetting(darkTheme: Boolean) {
+      //  Log.d("statetest", darkTheme.toString())
         settingsInteractor.updateThemeSetting(darkTheme)
     }
 

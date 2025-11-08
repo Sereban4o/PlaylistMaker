@@ -156,7 +156,7 @@ class TrackActivity : AppCompatActivity() {
         }
 
         track = intent.getParcelableExtra<Track>(TRACK_VIEW)!!
-
+        viewModel.checkFavoriteActivity(track)
         viewModel.observeState().observe(this) {
             render(it)
         }
