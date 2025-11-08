@@ -18,6 +18,10 @@ class FavoritesViewModel(
 
     private val stateLiveData = MutableLiveData<FavoritesState>()
 
+    init {
+        fillData()
+    }
+
     fun observeState(): LiveData<FavoritesState> = stateLiveData
 
     fun fillData() {

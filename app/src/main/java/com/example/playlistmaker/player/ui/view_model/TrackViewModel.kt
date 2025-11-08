@@ -21,7 +21,7 @@ class TrackViewModel(
     application: Application,
     private val favoritesInteractor: FavoritesInteractor,
     private val playlistsInteractor: PlaylistsInteractor
-    ) : AndroidViewModel(application) {
+) : AndroidViewModel(application) {
 
     private val playerStateLiveData = MutableLiveData<PlayerState>()
     private val message = SingleEventLiveData<String>()
@@ -31,9 +31,9 @@ class TrackViewModel(
     private var audioPlayerControl: AudioPlayerControl? = null
 
     init {
-        viewModelScope.launch {
-            checkFavorite(track)
-        }
+//        viewModelScope.launch {
+//            checkFavorite(track)
+//        }
         message.value = ""
         isAddedState.value = false
     }
@@ -91,6 +91,12 @@ class TrackViewModel(
         )
     }
 
+    fun checkFavoriteActivity(track: Track) {
+        viewModelScope.launch {
+            checkFavorite(track)
+        }
+    }
+
     fun editFavorite(track: Track) {
         viewModelScope.launch {
             if (playerStateLiveData.value?.isFavorite == true) {
@@ -132,7 +138,7 @@ class TrackViewModel(
         }
     }
 
-    fun addToPlaylist(playlist: Playlist, track: Track ) {
+    fun addToPlaylist(playlist: Playlist, track: Track) {
         viewModelScope.launch {
             var isAdded = false
             playlistsInteractor.checkTrackInPlaylist(track.trackId.toString(), playlist.id)

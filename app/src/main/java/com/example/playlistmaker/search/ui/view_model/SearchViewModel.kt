@@ -12,6 +12,9 @@ import com.example.playlistmaker.search.domain.state.TrackListHistoryState
 import com.example.playlistmaker.search.domain.state.TrackListState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -25,22 +28,21 @@ class SearchViewModel(
 
     private var stateLiveData = MutableLiveData<TrackListState>()
     private var stateHistoryLiveData = MutableLiveData<TrackListHistoryState>()
-    private var searchText: String? = ""
     private var searchJob: Job? = null
+    private val _text = MutableStateFlow("")
+    val text: StateFlow<String> = _text.asStateFlow()
 
+    fun onTextChanged(newText: String) {
+        _text.value = newText
 
-    fun searchDebounce(changedText: String) {
-
-        if (searchText == changedText) {
+        if (newText.isEmpty()) {
             return
         }
-
-        searchText = changedText
 
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(SEARCH_DEBOUNCE_DELAY)
-            searchTracks(changedText)
+            searchTracks(_text.value)
         }
     }
 
@@ -112,6 +114,11 @@ class SearchViewModel(
 
     fun clearHistory() {
         searchInteractor.clearHistory()
+        renderHistoryState(
+            TrackListHistoryState.Content(
+                tracks = mutableListOf<Track>()
+            )
+        )
     }
 
     fun addToHistory(track: Track) {

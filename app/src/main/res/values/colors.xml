@@ -8,6 +8,7 @@
     <color name="text_button">#000000</color>
     <color name="iconTint">#000000</color>
     <color name="textSettingsColor">#000000</color>
+    <color name="textToolbarColor">#000000</color>
     <color name="textSettingsColorDark">#FFFFFF</color>
     <color name="switch_thumb_active_color">#3772E7</color>
     <color name="switch_thumb_inactive_color">#AEAFB4</color>
@@ -44,4 +45,9 @@
     <color name="bdDialog">#FFFFFF</color>
     <color name="buttonDialog">#3772E7</color>
     <color name="titleDialog">#1A1B22</color>
+    <color name="uncheckedThumbColor">#E6E8EB</color>
+    <color name="uncheckedTrackColor">#AEAFB4</color>
+    <color name="checkedThumbColor">#9FBBF3</color>
+    <color name="checkedTrackColor">#3772E7</color>
+    <color name="cursor">#3772E7</color>
 </resources>

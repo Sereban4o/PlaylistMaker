@@ -1,245 +1,457 @@
 package com.example.playlistmaker.search.ui.fragment
 
 import android.annotation.SuppressLint
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.ProgressBar
-import androidx.core.view.isVisible
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import coil.compose.AsyncImage
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.player.ui.activity.TrackActivity
 import com.example.playlistmaker.search.domain.models.Track
-import com.example.playlistmaker.search.domain.state.TrackListHistoryState
 import com.example.playlistmaker.search.domain.state.TrackListState
-import com.example.playlistmaker.search.ui.adapter.HistoryTracksAdapter
-import com.example.playlistmaker.search.ui.adapter.TracksAdapter
+import com.example.playlistmaker.search.domain.state.TrackListHistoryState
 import com.example.playlistmaker.search.ui.view_model.SearchViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.getValue
 
 class SearchFragment : Fragment() {
-    companion object {
-        const val EDIT_TEXT = "EDIT_TEXT"
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
-    }
 
     private val viewModel: SearchViewModel by viewModel()
-    private lateinit var textWatcher: TextWatcher
-    private var text: String = ""
-    private lateinit var trackList: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var errorSearch: View
-    private lateinit var emptySearch: View
-    private lateinit var historyTrackList: RecyclerView
-    private lateinit var trackViewHistory: View
-    private lateinit var inputEditText: EditText
-    private val tracksAdapter = TracksAdapter {
-        if (clickDebounce()) {
-            viewModel.addToHistory(it)
-            findNavController().navigate(
-                R.id.action_searchFragment_to_trackActivity,
-                TrackActivity.createArgs(it)
-            )
-        }
-    }
-    private val trackHistoryAdapter = HistoryTracksAdapter {
-        if (clickDebounce()) {
-            findNavController().navigate(
-                R.id.action_searchFragment_to_trackActivity,
-                TrackActivity.createArgs(it)
-            )
-        }
-    }
-    private var isClickAllowed = true
-    private var _binding: FragmentSearchBinding? = null
-    private val binding get() = _binding!!
 
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        return binding.root
+    ): View {
+        return ComposeView(requireContext()).apply {
+
+            setContent {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = colorResource(R.color.background),
+                ) {
+                    Search(viewModel = viewModel)
+                }
+            }
+
+        }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        inputEditText = binding.edit
-        trackList = binding.trackList
-        trackList.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        trackList.adapter = tracksAdapter
-        progressBar = binding.progressBar
-        errorSearch = binding.errorSearch.root
-        emptySearch = binding.emptySearch.root
-        historyTrackList = binding.viewHistoryTracks.historyTrackList
-        historyTrackList.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        historyTrackList.adapter = trackHistoryAdapter
-        trackViewHistory = binding.viewHistoryTracks.root
-        binding.clearIcon.isVisible = !inputEditText.text.isEmpty()
-        viewModel.observeState().observe(viewLifecycleOwner) {
-            render(it)
-        }
+    @Composable
+    fun Search(viewModel: SearchViewModel) {
+        val text = viewModel.text.collectAsState().value
+        val trackListState by viewModel.observeState().observeAsState()
+        val focusRequester = remember { FocusRequester() }
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val historyTrackListState by viewModel.observeHistoryState().observeAsState()
 
-        viewModel.observeHistoryState().observe(viewLifecycleOwner) {
-            renderHistory(it)
-        }
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = 16.dp),
+        ) {
+            TopBar()
+            OutlinedTextField(
+                text,
+                { viewModel.onTextChanged(it) },
+                singleLine = true,
+                placeholder = {
+                    Text(
+                        stringResource(R.string.search),
+                        style = TextStyle(
+                            color = colorResource(R.color.searchColor),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = FontFamily(Font(R.font.ys_display_regular))
+                        )
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
+                    .onFocusChanged { if (it.isFocused && text.isEmpty()) viewModel.searchHistory() },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.search),
+                        contentDescription = null,
+                        tint = colorResource(R.color.searchColor)
+                    )
+                },
+                trailingIcon = {
+                    if (text.isNotEmpty()) Icon(
+                        painter = painterResource(R.drawable.search_clear),
+                        contentDescription = null,
+                        tint = colorResource(R.color.searchColor),
+                        modifier = Modifier.clickable(onClick = {
+                            viewModel.onTextChanged("")
+                            keyboardController?.hide()
+                            viewModel.clearSearch()
+                            viewModel.searchHistory()
+                        })
+                    )
+                },
 
-        inputEditText.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && inputEditText.text.isEmpty()) {
-                viewModel.searchHistory()
+                textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    fontFamily = FontFamily(Font(R.font.ys_display_regular)),
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = colorResource(R.color.black),
+                    unfocusedTextColor = colorResource(R.color.black),
+                    cursorColor = colorResource(R.color.cursor),
+                    focusedContainerColor = colorResource(R.color.editSearch),
+                    unfocusedContainerColor = colorResource(R.color.editSearch),
+                    focusedBorderColor = colorResource(R.color.editSearch),
+                    unfocusedBorderColor = colorResource(R.color.editSearch),
+                ),
+                shape = RoundedCornerShape(8.dp)
+            )
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
             }
-        }
-        inputEditText.requestFocus()
-        inputEditText.setText(text)
-
-        binding.errorSearch.errorButtonRefresh.setOnClickListener {
-            viewModel.searchDebounce(inputEditText.text.toString())
-        }
-
-        binding.viewHistoryTracks.clearHistory.setOnClickListener {
-            viewModel.clearHistory()
-            trackViewHistory.isVisible = false
-        }
-
-        if (savedInstanceState != null) {
-            text = savedInstanceState.getString(EDIT_TEXT).toString()
-        }
-
-        binding.clearIcon.setOnClickListener {
-            inputEditText.setText("")
-            viewModel.clearSearch()
-            errorSearch.isVisible = false
-            emptySearch.isVisible = false
-            tracksAdapter.notifyDataSetChanged()
-            hideSoftKeyboard(it)
-            viewModel.searchHistory()
-        }
-
-        textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                text = s.toString()
-                binding.clearIcon.isVisible = !s.isNullOrEmpty()
-                if (inputEditText.hasFocus() && inputEditText.text.isEmpty()) {
-                    viewModel.searchHistory()
-                } else {
-                    trackViewHistory.isVisible = false
+            when (trackListState) {
+                is TrackListState.Content -> (trackListState as TrackListState.Content).tracks?.let {
+                    LazyTrackList(
+                        it
+                    )
                 }
-                viewModel.searchDebounce(
-                    changedText = s?.toString() ?: ""
+
+                is TrackListState.Empty -> EmptySearch()
+                is TrackListState.Error -> ErrorSearch(text)
+                is TrackListState.Loading -> ProgressBar()
+                else -> {}
+            }
+            when (historyTrackListState) {
+                is TrackListHistoryState.Content -> (historyTrackListState as TrackListHistoryState.Content).tracks?.let {
+
+
+                    if (text.isEmpty() && it.isNotEmpty()) {
+                        LazyHistoryTrackList(
+                            it
+                        )
+                    }
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+    @Composable
+    fun LazyHistoryTrackList(trackList: List<Track>) {
+        Text(
+            text = stringResource(R.string.youSearch),
+            Modifier
+                .padding(top = 42.dp)
+                .fillMaxWidth(),
+            style = TextStyle(
+                color = colorResource(R.color.textSettingsColor),
+                fontSize = 19.sp,
+                fontWeight = FontWeight.Medium,
+                fontFamily = FontFamily(Font(R.font.ys_display_medium))
+            ), textAlign = TextAlign.Center
+        )
+        LazyColumn(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 18.dp)
+        ) {
+            items(trackList) {
+                TrackItem(it)
+            }
+        }
+
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                onClick = {
+                    viewModel.clearHistory()
+                }, Modifier.padding(top = 24.dp),
+                shape = RoundedCornerShape(54.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.refreshButtonBackground)
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.cleanHistory),
+                    style = TextStyle(
+                        color = colorResource(R.color.clearButtonText),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = FontFamily(Font(R.font.ys_display_medium))
+                    ),
                 )
             }
+        }
+    }
 
-            override fun afterTextChanged(s: Editable?) {
+    @Composable
+    fun LazyTrackList(trackList: List<Track>) {
+        LazyColumn(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            items(trackList) {
+                TrackItem(it)
             }
         }
-        textWatcher.let { inputEditText.addTextChangedListener(it) }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        textWatcher.let { inputEditText.removeTextChangedListener(it) }
-        _binding = null
-    }
+    @Composable
+    fun TrackItem(track: Track, modifier: Modifier = Modifier) {
+        Row(
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .clickable(onClick = {
+                    viewModel.addToHistory(track)
+                    findNavController().navigate(
 
-    private fun render(state: TrackListState) {
-        when (state) {
-            is TrackListState.Content -> state.tracks?.let { showContent(it) }
-            is TrackListState.Empty -> showEmpty()
-            is TrackListState.Error -> showError()
-            is TrackListState.Loading -> showLoading()
-        }
-    }
+                        R.id.action_searchFragment_to_trackActivity,
+                        TrackActivity.createArgs(track)
+                    )
+                }),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = track.artworkUrl100,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(45.dp)
+                    .clip(RoundedCornerShape(2.dp)),
+                placeholder = painterResource(id = R.drawable.placeholder)
+            )
 
-    private fun renderHistory(state: TrackListHistoryState) {
-        when (state) {
-            is TrackListHistoryState.Content -> state.tracks?.let { showHistoryContent(it) }
-        }
-
-    }
-
-    private fun showLoading() {
-        trackViewHistory.isVisible = false
-        trackList.isVisible = false
-        errorSearch.isVisible = false
-        emptySearch.isVisible = false
-        progressBar.isVisible = true
-    }
-
-    private fun showError() {
-        trackViewHistory.isVisible = false
-        trackList.isVisible = false
-        errorSearch.isVisible = true
-        emptySearch.isVisible = false
-        progressBar.isVisible = false
-    }
-
-    private fun showEmpty() {
-        trackViewHistory.isVisible = false
-        trackList.isVisible = false
-        errorSearch.isVisible = false
-        emptySearch.isVisible = true
-        progressBar.isVisible = false
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun showContent(tracks: List<Track>) {
-        trackViewHistory.isVisible = false
-        trackList.isVisible = true
-        progressBar.isVisible = false
-        tracksAdapter.trackList.clear()
-        tracksAdapter.trackList.addAll(tracks)
-        tracksAdapter.notifyDataSetChanged()
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun showHistoryContent(tracks: List<Track>) {
-        trackViewHistory.isVisible = tracks.isNotEmpty() && inputEditText.text.isEmpty()
-        trackHistoryAdapter.trackList.clear()
-        trackHistoryAdapter.trackList.addAll(tracks)
-        trackHistoryAdapter.notifyDataSetChanged()
-    }
-
-    private fun clickDebounce(): Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            viewLifecycleOwner.lifecycleScope.launch {
-                delay(CLICK_DEBOUNCE_DELAY)
-                isClickAllowed = true
+            Column(modifier.weight(1f).padding(start = 8.dp)) {
+                track.trackName?.let {
+                    Text(
+                        text = it,
+                        softWrap = false,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = TextStyle(
+                            color = colorResource(R.color.TextTrack),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            fontFamily = FontFamily(Font(R.font.ys_display_regular))
+                        )
+                    )
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    track.artistName?.let {
+                        Text(
+                            text = it,
+                            softWrap = false,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = TextStyle(
+                                color = colorResource(R.color.subTextTrack),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Normal,
+                                fontFamily = FontFamily(Font(R.font.ys_display_regular))
+                            )
+                        )
+                    }
+                    Icon(
+                        modifier = Modifier.padding(horizontal = 5.dp),
+                        contentDescription = null,
+                        painter = painterResource(R.drawable.separator_playlist),
+                        tint = colorResource(R.color.subTextTrack)
+                    )
+                    track.trackTimeMillis?.let {
+                        Text(
+                            text = it,
+                            softWrap = false,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = TextStyle(
+                                color = colorResource(R.color.subTextTrack),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Normal,
+                                fontFamily = FontFamily(Font(R.font.ys_display_regular))
+                            )
+                        )
+                    }
+                }
             }
 
+            Image(
+                contentDescription = null,
+                painter = painterResource(R.drawable.arrow_button),
+                alignment = Alignment.CenterEnd
+            )
         }
-        return current
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(EDIT_TEXT, text)
+    @Composable
+    fun TopBar() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+
+            Text(
+                stringResource(R.string.search),
+                style = TextStyle(
+                    color = colorResource(id = R.color.textToolbarColor),
+                    fontWeight = FontWeight.Medium,
+                    fontFamily = FontFamily(Font(R.font.ys_display_medium)),
+                    fontSize = 22.sp
+                ),
+                modifier = Modifier.padding(top = 14.dp, bottom = 16.dp)
+            )
+        }
     }
 
-    private fun hideSoftKeyboard(view: View) {
-        val manager = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        manager.hideSoftInputFromWindow(view.windowToken, 0)
+    @Composable
+    fun ProgressBar() {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ) {
+            CircularProgressIndicator(
+                color = colorResource(R.color.progressBar),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 140.dp)
+            )
+        }
+
+    }
+
+    @Composable
+    fun EmptySearch() {
+        Column(Modifier
+            .fillMaxHeight()
+            .fillMaxWidth()) {
+            Image(
+                contentDescription = null,
+                painter = painterResource(R.drawable.empty_search),
+                modifier = Modifier
+                    .padding(top = 110.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Text(
+                text = stringResource(R.string.emptySearch),
+                style = TextStyle(
+                    color = colorResource(id = R.color.textSettingsColor),
+                    fontWeight = FontWeight.Normal,
+                    fontFamily = FontFamily(Font(R.font.ys_display_medium)),
+                    fontSize = 19.sp
+                ),
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+        }
+
+    }
+
+
+    @Composable
+    fun ErrorSearch(text: String) {
+        Column(Modifier
+            .fillMaxHeight()
+            .fillMaxWidth()) {
+            Image(
+                contentDescription = null,
+                painter = painterResource(R.drawable.error_search),
+                modifier = Modifier
+                    .padding(top = 110.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Text(
+                text = stringResource(R.string.errorSearch),
+                textAlign = TextAlign.Center,
+                style = TextStyle(
+                    color = colorResource(id = R.color.textSettingsColor),
+                    fontWeight = FontWeight.Normal,
+                    fontFamily = FontFamily(Font(R.font.ys_display_medium)),
+                    fontSize = 19.sp
+                ),
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Button(
+                onClick = {
+                    viewModel.onTextChanged(text)
+                }, modifier = Modifier
+                    .padding(top = 24.dp)
+                    .align(Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(54.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.refreshButtonBackground)
+                )
+            ) {
+                Text(
+                    text = stringResource(R.string.refresh),
+                    style = TextStyle(
+                        color = colorResource(R.color.refreshButtonText),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = FontFamily(Font(R.font.ys_display_medium))
+                    ),
+                )
+            }
+        }
+
     }
 }
